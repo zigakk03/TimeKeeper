@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Time Keeper</string>
+    <string name="btn_add_description">Add notification / event</string>
+    <string name="btn_calendar_description">Go to calendar</string>
+</resources>
