@@ -2,4 +2,12 @@
     <string name="app_name">Time Keeper</string>
     <string name="btn_add_description">Add notification / event</string>
     <string name="btn_calendar_description">Go to calendar</string>
+    <string name="btn_save_description">Save</string>
+    <string name="btn_delete_description">Delete</string>
+    <string name="btn_edit_description">Edit</string>
+    <string name="btn_pick_colour_description">Pick a colour</string>
+    <string name="add_page_title1">Add Notification</string>
+    <string name="add_page_title2">Add Event</string>
+    <string name="i_txt_notification_title">Title</string>
+    <string name="i_txt_notification_description">Description</string>
 </resources>
