@@ -16,6 +16,11 @@ interface NotificationDao {
     @Delete
     suspend fun deleteNotification(notification: Notification)
 
-    @Query("SELECT * FROM notification WHERE dateTime <= :currentTime ORDER BY dateTime ASC")
-    fun getRelevantNotifications(currentTime: Timestamp? = Timestamp(System.currentTimeMillis())): Flow<List<Notification>>
+    // TODO: Implement the correct query
+    /*@Query("SELECT * FROM notification WHERE dateTime <= :currentTime ORDER BY dateTime ASC")
+    fun getRelevantNotifications(currentTime: Timestamp? = Timestamp(System.currentTimeMillis())): List<Notification>
+    */
+
+    @Query("SELECT * FROM notification")
+    suspend fun getRelevantNotifications(): MutableList<Notification>
 }

@@ -1,32 +1,21 @@
 package com.example.timekeeper
 
+import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.launch
+import java.time.format.DateTimeFormatter
 
 class NotificationAdapter(
-    private val notificationDataTempLists: MutableList<NotificationDataTemp> = mutableListOf(
-        NotificationDataTemp(null,"test", "this is a simple test", "12:12", "12.01.23"),
-        NotificationDataTemp("#E6DD0F","test1", "this\nis\na\nsimple\ntest", "12:12", "12.01.23"),
-        NotificationDataTemp(null,"test2", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris condimentum felis at est mollis, ac venenatis turpis malesuada. Praesent suscipit vehicula nisi ac dapibus. Curabitur convallis risus sed pretium venenatis. Maecenas erat leo, interdum sit amet congue vel, tincidunt ac erat. Aliquam id eros vestibulum massa pellentesque efficitur non non mauris. Donec tincidunt pellentesque iaculis. Suspendisse leo enim, mattis vel ipsum non, porttitor consectetur ex. Vestibulum vestibulum tortor vel aliquet malesuada. Ut mi quam, consequat at augue quis, auctor sodales justo. Nam a varius nunc, et rutrum diam. Praesent nunc ligula, tincidunt at varius ac, aliquet ac massa.", "12:12", "12.01.23"),
-        NotificationDataTemp("","test3", "this is a simple test", "12:12", "12.01.23"),
-        NotificationDataTemp("","test3", "this is a simple test", "12:12", "12.01.23"),
-        NotificationDataTemp("#E6DD0F","test3", "this is a colour test", "12:12", "12.01.23"),
-        NotificationDataTemp("","test3", "this is a simple test", "12:12", "12.01.23"),
-        NotificationDataTemp("","test3", "this is a simple test", "12:12", "12.01.23"),
-        NotificationDataTemp(null,"test3", "this is a simple test", "12:12", "12.01.23"),
-        NotificationDataTemp("","test3", "this is a simple test", "12:12", "12.01.23"),
-        NotificationDataTemp("","test3", "this is a simple test", "12:12", "12.01.23"),
-        NotificationDataTemp("#E6DD0F","test3", "this is a simple test", "12:12", "12.01.23"),
-        NotificationDataTemp("#2DE60F","test3 tetetzetetezteeghfhffghfhfnklmlkkcsz hfjk hfhjd zfuthig gfbkn hgjk gkjbkg hkhg", "this is a simple test", "12:12", "12.01.23"),
-        NotificationDataTemp("#2DE60F","test3 jsalkdjaj\nisajdsa\njane", "this is a simple test", "12:12", "12.01.23"),
-        NotificationDataTemp("#2DE60F","test3", "this is a simple test", "12:12", "12.01.23"),
-        NotificationDataTemp(null,"test3", "this is a simple test", "12:12", "12.01.23"),
-        NotificationDataTemp("","test3", "this is a simple test", "12:12", "12.01.23"),
-        )
+    private val notificationDataLists: MutableList<Notification>,
+    private val appContext: Context,
+    private val lifecycleScope: LifecycleCoroutineScope
 ): RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder>() {
 
     class NotificationViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
@@ -39,17 +28,31 @@ class NotificationAdapter(
     }
 
     override fun onBindViewHolder(holder: NotificationViewHolder, position: Int) {
-        val curNotification = notificationDataTempLists[position]
+        val curNotification = notificationDataLists[position]
         if (!curNotification.colour.isNullOrEmpty()){
             holder.itemView.findViewById<View>(R.id.vColorStrip).setBackgroundColor(Color.parseColor(curNotification.colour))
         }
         holder.itemView.findViewById<TextView>(R.id.tvTitle).text = curNotification.title
         holder.itemView.findViewById<TextView>(R.id.tvDescription).text = curNotification.description
-        holder.itemView.findViewById<TextView>(R.id.tvDate).text = curNotification.date
-        holder.itemView.findViewById<TextView>(R.id.tvTime).text = curNotification.time
+        holder.itemView.findViewById<TextView>(R.id.tvDate).text = curNotification.dateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+        holder.itemView.findViewById<TextView>(R.id.tvTime).text = curNotification.dateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+
+        holder.itemView.findViewById<ImageButton>(R.id.btnDelete).setOnClickListener {
+            lifecycleScope.launch {
+                //database setup
+                val db = NotificationDatabase.getDatabase(appContext)
+                val notifDao = db.notificationDao()
+                notifDao.deleteNotification(curNotification)
+
+                notificationDataLists.removeAt(position)
+                notifyItemRemoved(position)
+                notifyItemRangeChanged(position, itemCount)
+
+            }
+        }
     }
 
     override fun getItemCount(): Int {
-        return notificationDataTempLists.size
+        return notificationDataLists.size
     }
 }

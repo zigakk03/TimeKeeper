@@ -2,7 +2,7 @@ package com.example.timekeeper
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.sql.Timestamp
+import java.time.LocalDateTime
 
 @Entity
 data class Notification(
@@ -11,5 +11,5 @@ data class Notification(
     val colour: String?,
     val title: String,
     val description: String,
-    val dateTime: Timestamp
+    val dateTime: LocalDateTime
 )

@@ -1,6 +1,8 @@
 package com.example.timekeeper
 
+import android.content.Context
 import androidx.room.Database
+import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
@@ -8,7 +10,24 @@ import androidx.room.TypeConverters
     entities = [Notification::class],
     version = 1
 )
-@TypeConverters(TimestampConverters::class)
+@TypeConverters(DateTimeConverters::class)
 abstract class NotificationDatabase: RoomDatabase() {
-    abstract val dao: NotificationDao
+    abstract fun notificationDao(): NotificationDao
+
+    companion object {
+        @Volatile
+        private var INSTANCE: NotificationDatabase? = null
+
+        fun getDatabase(context: Context): NotificationDatabase {
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    NotificationDatabase::class.java,
+                    "notifications"
+                ).build()
+                INSTANCE = instance
+                instance
+            }
+        }
+    }
 }
