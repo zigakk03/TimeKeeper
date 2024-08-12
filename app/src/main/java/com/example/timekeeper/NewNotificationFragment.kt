@@ -1,13 +1,18 @@
 package com.example.timekeeper
 
-import android.graphics.Color
+import android.animation.ArgbEvaluator
+import android.animation.ObjectAnimator
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageButton
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
@@ -24,6 +29,7 @@ class NewNotificationFragment : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,7 +38,7 @@ class NewNotificationFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_new_notification, container, false)
 
-        var colorButton = Color.parseColor("#FF0FA2E6")
+        var colorButton = ContextCompat.getColor(requireContext(), R.color.accent)
         view.findViewById<ImageButton>(R.id.btnColorPicker).setOnClickListener {
             ColorPickerDialogBuilder
                 .with(context)
@@ -62,11 +68,39 @@ class NewNotificationFragment : Fragment() {
             ).build()
             val notifDao = db.notificationDao()
             lifecycleScope.launch {
-                // TODO: Saving custom notification
-                notifDao.upsertNotification(Notification(0, "#FF0FA2E6", "test", "test d", LocalDateTime.now() ))
-            }
+                if (!view.findViewById<EditText>(R.id.iTxtTitle).text.isNullOrEmpty()) {
+                    notifDao.upsertNotification(Notification(
+                        0,
+                        '#'+colorButton.toHexString(),
+                        view.findViewById<EditText>(R.id.iTxtTitle).text.toString(),
+                        view.findViewById<EditText>(R.id.iTxtDescription).text.toString(),
+                        LocalDateTime.now()
+                        ))
+                    //TODO: clear backstack
+                    Navigation.findNavController(view).navigate(R.id.navigate_newNotification_to_home)
+                }
+                else {
+                    val iTxtTitle = view.findViewById<EditText>(R.id.iTxtTitle)
 
-            Navigation.findNavController(view).navigate(R.id.navigate_newNotification_to_home)
+                    val colorAnim = ObjectAnimator.ofArgb(
+                        iTxtTitle,
+                        "hintTextColor",
+                        ContextCompat.getColor(requireContext(), R.color.black),
+                        ContextCompat.getColor(requireContext(), R.color.alert)
+                    ).apply {
+                        duration = 500
+                        repeatMode = ObjectAnimator.REVERSE
+                        repeatCount = 3
+                        setEvaluator(ArgbEvaluator())
+                    }
+
+                    colorAnim.start()
+
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        iTxtTitle.setHintTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                    }, 2000)
+                }
+            }
         }
 
         return view

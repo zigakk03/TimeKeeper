@@ -7,4 +7,5 @@
     <color name="gray">#FF767676</color>
     <color name="silver">#FFB7B7B7</color>
     <color name="empty">#00000000</color>
+    <color name="alert">#FFE61010</color>
 </resources>

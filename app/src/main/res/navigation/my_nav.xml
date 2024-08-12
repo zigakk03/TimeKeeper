@@ -14,7 +14,9 @@
             android:id="@+id/navigate_newNotification_to_home"
             app:destination="@id/homeFragment"
             app:enterAnim="@android:anim/slide_in_left"
-            app:exitAnim="@android:anim/fade_out" />
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/homeFragment"
@@ -25,6 +27,8 @@
             android:id="@+id/navigate_to_add_notification"
             app:destination="@id/newNotificationFragment"
             app:enterAnim="@android:anim/slide_in_left"
-            app:exitAnim="@android:anim/fade_out" />
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/fade_out" />
     </fragment>
 </navigation>
