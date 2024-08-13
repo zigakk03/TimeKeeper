@@ -1,7 +1,17 @@
+buildscript {
+    repositories {
+        google()
+    }
+    dependencies {
+        classpath(libs.navigation.safe.args.gradle.plugin)
+    }
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     kotlin("kapt")
+    id("androidx.navigation.safeargs.kotlin") version "2.7.7"
 }
 
 android {

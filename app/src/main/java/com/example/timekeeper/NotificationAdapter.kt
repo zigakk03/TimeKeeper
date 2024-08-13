@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.navigation.NavDirections
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
@@ -29,8 +31,8 @@ class NotificationAdapter(
 
     override fun onBindViewHolder(holder: NotificationViewHolder, position: Int) {
         val curNotification = notificationDataLists[position]
-        if (!curNotification.colour.isNullOrEmpty()){
-            holder.itemView.findViewById<View>(R.id.vColorStrip).setBackgroundColor(Color.parseColor(curNotification.colour))
+        if (!curNotification.color.isNullOrEmpty()){
+            holder.itemView.findViewById<View>(R.id.vColorStrip).setBackgroundColor(Color.parseColor(curNotification.color))
         }
         holder.itemView.findViewById<TextView>(R.id.tvTitle).text = curNotification.title
         holder.itemView.findViewById<TextView>(R.id.tvDescription).text = curNotification.description
@@ -49,6 +51,12 @@ class NotificationAdapter(
                 notifyItemRangeChanged(position, itemCount)
 
             }
+        }
+
+        holder.itemView.findViewById<ImageButton>(R.id.btnEdit).setOnClickListener {
+            val action = HomeFragmentDirections.navigateHomeToEditNotification(curNotification.id)
+
+            Navigation.findNavController(holder.itemView).navigate(action)
         }
     }
 

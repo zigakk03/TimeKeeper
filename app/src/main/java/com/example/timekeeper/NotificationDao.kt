@@ -23,4 +23,7 @@ interface NotificationDao {
 
     @Query("SELECT * FROM notification")
     suspend fun getRelevantNotifications(): MutableList<Notification>
+
+    @Query("SELECT * FROM notification WHERE id=:id")
+    suspend fun getNotification(id: Int): Notification
 }

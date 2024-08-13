@@ -2,42 +2,53 @@ package com.example.timekeeper
 
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
-import android.os.Build
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.navArgs
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
-
-class NewNotificationFragment : Fragment() {
+@OptIn(ExperimentalStdlibApi::class)
+class EditNotificationFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_new_notification, container, false)
+        val view = inflater.inflate(R.layout.fragment_edit_notification, container, false)
 
         var colorButton = ContextCompat.getColor(requireContext(), R.color.accent)
+        val args: EditNotificationFragmentArgs by navArgs()
+        lifecycleScope.launch {
+            //database setup
+            val db = NotificationDatabase.getDatabase(requireContext())
+            val notifDao = db.notificationDao()
+            val selectedNotification = notifDao.getNotification(args.notificationId)
+
+            colorButton = Color.parseColor(selectedNotification.color)
+            view.findViewById<ImageButton>(R.id.btnColorPicker).setBackgroundColor(colorButton)
+            view.findViewById<EditText>(R.id.iTxtTitle).setText(selectedNotification.title)
+            view.findViewById<EditText>(R.id.iTxtDescription).setText(selectedNotification.description)
+        }
+
         view.findViewById<ImageButton>(R.id.btnColorPicker).setOnClickListener {
             ColorPickerDialogBuilder
                 .with(context)
@@ -66,14 +77,14 @@ class NewNotificationFragment : Fragment() {
             lifecycleScope.launch {
                 if (!view.findViewById<EditText>(R.id.iTxtTitle).text.isNullOrEmpty()) {
                     notifDao.upsertNotification(Notification(
-                        0,
+                        args.notificationId,
                         '#'+colorButton.toHexString(),
                         view.findViewById<EditText>(R.id.iTxtTitle).text.toString(),
                         view.findViewById<EditText>(R.id.iTxtDescription).text.toString(),
                         LocalDateTime.now()
-                        ))
+                    ))
 
-                    Navigation.findNavController(view).navigate(R.id.navigate_newNotification_to_home)
+                    Navigation.findNavController(view).navigate(R.id.navigate_editNotification_to_home)
                 }
                 else {
                     val iTxtTitle = view.findViewById<EditText>(R.id.iTxtTitle)

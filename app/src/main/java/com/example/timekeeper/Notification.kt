@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 data class Notification(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val colour: String?,
+    val color: String?,
     val title: String,
     val description: String,
     val dateTime: LocalDateTime
