@@ -1,7 +1,8 @@
-package com.example.timekeeper
+package com.example.timekeeper.fragments
 
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -12,10 +13,16 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
+import com.example.timekeeper.App
+import com.example.timekeeper.R
+import com.example.timekeeper.database.Notification
+import com.example.timekeeper.database.NotificationDatabase
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
 import kotlinx.coroutines.launch
@@ -62,16 +69,41 @@ class NewNotificationFragment : Fragment() {
         view.findViewById<ImageButton>(R.id.btnSave).setOnClickListener {
             //database setup
             val db = NotificationDatabase.getDatabase(requireContext())
-            val notifDao = db.notificationDao()
+            val notificationDao = db.notificationDao()
             lifecycleScope.launch {
                 if (!view.findViewById<EditText>(R.id.iTxtTitle).text.isNullOrEmpty()) {
-                    notifDao.upsertNotification(Notification(
+                    val titleTxt = view.findViewById<EditText>(R.id.iTxtTitle).text.toString()
+                    val descriptionTxt = view.findViewById<EditText>(R.id.iTxtDescription).text.toString()
+                    val notificationColor = '#'+colorButton.toHexString()
+                    val notificationId = notificationDao.upsertNotification(
+                        Notification(
                         0,
-                        '#'+colorButton.toHexString(),
-                        view.findViewById<EditText>(R.id.iTxtTitle).text.toString(),
-                        view.findViewById<EditText>(R.id.iTxtDescription).text.toString(),
+                        notificationColor,
+                        titleTxt,
+                        descriptionTxt,
                         LocalDateTime.now()
-                        ))
+                        )
+                    )
+
+                    var builder = NotificationCompat.Builder(requireContext(), App.CHANNEL_ID)
+                        .setSmallIcon(R.drawable.outline_notifications_24)
+                        .setColor(Color.parseColor(notificationColor))
+                        .setContentTitle(titleTxt)
+                        .setContentText(descriptionTxt)
+                        .setStyle(NotificationCompat.BigTextStyle()
+                            .bigText(descriptionTxt))
+                        .setOngoing(true)
+                        //.setContentIntent() todo - open edit
+                        // todo - swipe deletes notification
+                        .setAutoCancel(false)
+                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                        .setOnlyAlertOnce(true)
+
+
+                    with(NotificationManagerCompat.from(requireContext())) {
+                        // notificationId is a unique int for each notification that you must define.
+                        notify(notificationId.toInt(), builder.build())
+                    }
 
                     Navigation.findNavController(view).navigate(R.id.navigate_newNotification_to_home)
                 }
@@ -93,7 +125,9 @@ class NewNotificationFragment : Fragment() {
                     colorAnim.start()
 
                     Handler(Looper.getMainLooper()).postDelayed({
-                        iTxtTitle.setHintTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                        iTxtTitle.setHintTextColor(ContextCompat.getColor(requireContext(),
+                            R.color.black
+                        ))
                     }, 2000)
                 }
             }

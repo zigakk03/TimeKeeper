@@ -1,18 +1,16 @@
-package com.example.timekeeper
+package com.example.timekeeper.database
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
-import kotlinx.coroutines.flow.Flow
-import java.sql.Timestamp
 import java.time.LocalDateTime
 
 @Dao
 interface NotificationDao {
 
     @Upsert
-    suspend fun upsertNotification(notification: Notification)
+    suspend fun upsertNotification(notification: Notification): Long
 
     @Delete
     suspend fun deleteNotification(notification: Notification)

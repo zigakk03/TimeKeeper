@@ -1,4 +1,4 @@
-package com.example.timekeeper
+package com.example.timekeeper.adapters
 
 import android.content.Context
 import android.graphics.Color
@@ -8,9 +8,12 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
+import com.example.timekeeper.R
+import com.example.timekeeper.database.Notification
+import com.example.timekeeper.database.NotificationDatabase
+import com.example.timekeeper.fragments.HomeFragmentDirections
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/jet"
-    tools:context=".NewNotificationFragment">
+    tools:context=".fragments.NewNotificationFragment">
 
     <View
         android:id="@+id/vTitle"

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/newNotificationFragment"
-        android:name="com.example.timekeeper.NewNotificationFragment"
+        android:name="com.example.timekeeper.fragments.NewNotificationFragment"
         android:label="fragment_new_notification"
         tools:layout="@layout/fragment_new_notification" >
         <action
@@ -22,7 +22,7 @@
     </fragment>
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.timekeeper.HomeFragment"
+        android:name="com.example.timekeeper.fragments.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
         <action
@@ -42,7 +42,7 @@
     </fragment>
     <fragment
         android:id="@+id/editNotificationFragment"
-        android:name="com.example.timekeeper.EditNotificationFragment"
+        android:name="com.example.timekeeper.fragments.EditNotificationFragment"
         android:label="fragment_edit_notification"
         tools:layout="@layout/fragment_edit_notification" >
         <action

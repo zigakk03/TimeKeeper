@@ -1,7 +1,6 @@
-package com.example.timekeeper
+package com.example.timekeeper.database
 
 import androidx.room.TypeConverter
-import java.sql.Timestamp
 import java.time.LocalDateTime
 
 class DateTimeConverters {

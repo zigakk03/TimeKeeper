@@ -1,4 +1,4 @@
-package com.example.timekeeper
+package com.example.timekeeper.database
 
 import android.content.Context
 import androidx.room.Database

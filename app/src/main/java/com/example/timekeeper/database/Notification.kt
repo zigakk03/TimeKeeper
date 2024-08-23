@@ -1,4 +1,4 @@
-package com.example.timekeeper
+package com.example.timekeeper.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

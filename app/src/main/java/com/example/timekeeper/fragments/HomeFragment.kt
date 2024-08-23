@@ -1,4 +1,4 @@
-package com.example.timekeeper
+package com.example.timekeeper.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -9,6 +9,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.timekeeper.adapters.NotificationAdapter
+import com.example.timekeeper.R
+import com.example.timekeeper.database.NotificationDatabase
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
 
@@ -38,7 +41,9 @@ class HomeFragment : Fragment() {
 
 
 
-        view.findViewById<FloatingActionButton>(R.id.fBtnAddNotification).setOnClickListener { Navigation.findNavController(view).navigate(R.id.navigate_to_add_notification) }
+        view.findViewById<FloatingActionButton>(R.id.fBtnAddNotification).setOnClickListener { Navigation.findNavController(view).navigate(
+            R.id.navigate_to_add_notification
+        ) }
 
         return view
     }

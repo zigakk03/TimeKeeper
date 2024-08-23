@@ -11,4 +11,6 @@
     <string name="edit_notification_page_title">Edit Notification</string>
     <string name="i_txt_notification_title">Title</string>
     <string name="i_txt_notification_description">Description</string>
+    <string name="notification_channel_name">Time Keeper Notifications</string>
+    <string name="notification_channel_description">Notifications to help you manage your time and stay on track with your schedule.</string>
 </resources>
