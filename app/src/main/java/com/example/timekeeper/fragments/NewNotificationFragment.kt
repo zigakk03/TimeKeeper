@@ -2,6 +2,8 @@ package com.example.timekeeper.fragments
 
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
+import android.app.PendingIntent
+import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -20,6 +22,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import com.example.timekeeper.App
+import com.example.timekeeper.MainActivity
 import com.example.timekeeper.R
 import com.example.timekeeper.database.Notification
 import com.example.timekeeper.database.NotificationDatabase
@@ -85,6 +88,13 @@ class NewNotificationFragment : Fragment() {
                         )
                     )
 
+                    val intent = Intent(requireContext(), MainActivity::class.java)
+                    val pendingIntent = PendingIntent.getActivity(
+                        requireContext(),
+                        1,
+                        intent,
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+                    )
                     var builder = NotificationCompat.Builder(requireContext(), App.CHANNEL_ID)
                         .setSmallIcon(R.drawable.outline_notifications_24)
                         .setColor(Color.parseColor(notificationColor))
@@ -93,7 +103,7 @@ class NewNotificationFragment : Fragment() {
                         .setStyle(NotificationCompat.BigTextStyle()
                             .bigText(descriptionTxt))
                         .setOngoing(true)
-                        //.setContentIntent() todo - open edit
+                        .setContentIntent(pendingIntent)
                         // todo - swipe deletes notification
                         .setAutoCancel(false)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

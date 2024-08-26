@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
@@ -53,6 +54,10 @@ class NotificationAdapter(
                 notifyItemRemoved(position)
                 notifyItemRangeChanged(position, itemCount)
 
+                with(NotificationManagerCompat.from(appContext)) {
+                    // notificationId is a unique int for each notification that you must define.
+                    cancel(curNotification.id)
+                }
             }
         }
 
