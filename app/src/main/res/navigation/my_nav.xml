@@ -6,12 +6,12 @@
     app:startDestination="@id/homeFragment">
 
     <fragment
-        android:id="@+id/newNotificationFragment"
-        android:name="com.example.timekeeper.fragments.NewNotificationFragment"
+        android:id="@+id/newReminderFragment"
+        android:name="com.example.timekeeper.fragments.NewReminderFragment"
         android:label="fragment_new_notification"
         tools:layout="@layout/fragment_new_notification" >
         <action
-            android:id="@+id/navigate_newNotification_to_home"
+            android:id="@+id/navigate_newReminder_to_home"
             app:destination="@id/homeFragment"
             app:enterAnim="@android:anim/slide_in_left"
             app:exitAnim="@android:anim/fade_out"
@@ -26,27 +26,27 @@
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
         <action
-            android:id="@+id/navigate_to_add_notification"
-            app:destination="@id/newNotificationFragment"
+            android:id="@+id/navigate_to_add_reminder"
+            app:destination="@id/newReminderFragment"
             app:enterAnim="@android:anim/slide_in_left"
             app:exitAnim="@android:anim/fade_out"
             app:popEnterAnim="@android:anim/slide_in_left"
             app:popExitAnim="@android:anim/fade_out" />
         <action
-            android:id="@+id/navigate_home_to_editNotification"
-            app:destination="@id/editNotificationFragment"
+            android:id="@+id/navigate_home_to_editReminder"
+            app:destination="@id/editReminderFragment"
             app:enterAnim="@android:anim/slide_in_left"
             app:exitAnim="@android:anim/fade_out"
             app:popEnterAnim="@android:anim/slide_in_left"
             app:popExitAnim="@android:anim/fade_out" />
     </fragment>
     <fragment
-        android:id="@+id/editNotificationFragment"
-        android:name="com.example.timekeeper.fragments.EditNotificationFragment"
+        android:id="@+id/editReminderFragment"
+        android:name="com.example.timekeeper.fragments.EditReminderFragment"
         android:label="fragment_edit_notification"
         tools:layout="@layout/fragment_edit_notification" >
         <action
-            android:id="@+id/navigate_editNotification_to_home"
+            android:id="@+id/navigate_editReminder_to_home"
             app:destination="@id/homeFragment"
             app:enterAnim="@android:anim/slide_in_left"
             app:exitAnim="@android:anim/fade_out"

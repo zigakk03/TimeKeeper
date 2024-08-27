@@ -7,22 +7,22 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 @Database(
-    entities = [Notification::class],
+    entities = [Reminder::class],
     version = 1
 )
 @TypeConverters(DateTimeConverters::class)
-abstract class NotificationDatabase: RoomDatabase() {
-    abstract fun notificationDao(): NotificationDao
+abstract class ReminderDatabase: RoomDatabase() {
+    abstract fun reminderDao(): ReminderDao
 
     companion object {
         @Volatile
-        private var INSTANCE: NotificationDatabase? = null
+        private var INSTANCE: ReminderDatabase? = null
 
-        fun getDatabase(context: Context): NotificationDatabase {
+        fun getDatabase(context: Context): ReminderDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    NotificationDatabase::class.java,
+                    ReminderDatabase::class.java,
                     "notifications"
                 ).build()
                 INSTANCE = instance

@@ -9,9 +9,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.timekeeper.adapters.NotificationAdapter
+import com.example.timekeeper.adapters.ReminderAdapter
 import com.example.timekeeper.R
-import com.example.timekeeper.database.NotificationDatabase
+import com.example.timekeeper.database.ReminderDatabase
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
 
@@ -28,21 +28,21 @@ class HomeFragment : Fragment() {
 
         lifecycleScope.launch {
             //database setup
-            val db = NotificationDatabase.getDatabase(requireContext())
-            val notifDao = db.notificationDao()
-            val relevantNotifications = notifDao.getRelevantNotifications()
+            val db = ReminderDatabase.getDatabase(requireContext())
+            val notifDao = db.reminderDao()
+            val relevantNotifications = notifDao.getRelevantReminders()
 
             // Notification RecyclerView setup
             val notificationRecyclerView: RecyclerView = view.findViewById(R.id.rvNotifications)
             notificationRecyclerView.layoutManager = LinearLayoutManager(context)
-            val customNotificationAdapter = NotificationAdapter(relevantNotifications, requireContext(), lifecycleScope)
-            notificationRecyclerView.adapter = customNotificationAdapter
+            val customReminderAdapter = ReminderAdapter(relevantNotifications, requireContext(), lifecycleScope)
+            notificationRecyclerView.adapter = customReminderAdapter
         }
 
 
 
         view.findViewById<FloatingActionButton>(R.id.fBtnAddNotification).setOnClickListener { Navigation.findNavController(view).navigate(
-            R.id.navigate_to_add_notification
+            R.id.navigate_to_add_reminder
         ) }
 
         return view

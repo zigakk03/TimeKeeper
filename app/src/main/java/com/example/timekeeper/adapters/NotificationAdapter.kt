@@ -1,74 +1,64 @@
 package com.example.timekeeper.adapters
 
+import android.annotation.SuppressLint
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
+import android.os.Build
+import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.navigation.Navigation
-import androidx.recyclerview.widget.RecyclerView
+import com.example.timekeeper.App
+import com.example.timekeeper.MainActivity
 import com.example.timekeeper.R
-import com.example.timekeeper.database.Notification
-import com.example.timekeeper.database.NotificationDatabase
-import com.example.timekeeper.fragments.HomeFragmentDirections
-import kotlinx.coroutines.launch
-import java.time.format.DateTimeFormatter
 
-class NotificationAdapter(
-    private val notificationDataLists: MutableList<Notification>,
-    private val appContext: Context,
-    private val lifecycleScope: LifecycleCoroutineScope
-): RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder>() {
+object NotificationAdapter {
+    @SuppressLint("MissingPermission")
+    fun createAndShowNotification(
+        context: Context,
+        notificationColor: String,
+        titleTxt: String,
+        descriptionTxt: String,
+        reminderId: Int
+    ){
+        val intent = Intent(context, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            1,
+            intent,
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+        )
 
-    class NotificationViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotificationViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.notification, parent, false)
-
-        return NotificationViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: NotificationViewHolder, position: Int) {
-        val curNotification = notificationDataLists[position]
-        if (!curNotification.color.isNullOrEmpty()){
-            holder.itemView.findViewById<View>(R.id.vColorStrip).setBackgroundColor(Color.parseColor(curNotification.color))
+        // TODO - investigate why it isn't deleting
+        val deleteIntent = Intent(context, NotificationDismissReceiver::class.java).apply{
+            putExtra("reminder_id", reminderId)
         }
-        holder.itemView.findViewById<TextView>(R.id.tvTitle).text = curNotification.title
-        holder.itemView.findViewById<TextView>(R.id.tvDescription).text = curNotification.description
-        holder.itemView.findViewById<TextView>(R.id.tvDate).text = curNotification.dateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-        holder.itemView.findViewById<TextView>(R.id.tvTime).text = curNotification.dateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+        val pendingDeleteIntent = PendingIntent.getActivity(
+            context,
+            2,
+            deleteIntent,
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+        )
 
-        holder.itemView.findViewById<ImageButton>(R.id.btnDelete).setOnClickListener {
-            lifecycleScope.launch {
-                //database setup
-                val db = NotificationDatabase.getDatabase(appContext)
-                val notifDao = db.notificationDao()
-                notifDao.deleteNotification(curNotification)
+        var builder = NotificationCompat.Builder(context, App.CHANNEL_ID)
+            .setSmallIcon(R.drawable.outline_notifications_24)
+            .setColor(Color.parseColor(notificationColor))
+            .setContentTitle(titleTxt)
+            .setContentText(descriptionTxt)
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                .bigText(descriptionTxt))
+            .setOngoing(true)
+            .setContentIntent(pendingIntent)
+            .setDeleteIntent(pendingDeleteIntent)
+            .setAutoCancel(false)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setOnlyAlertOnce(true)
 
-                notificationDataLists.removeAt(position)
-                notifyItemRemoved(position)
-                notifyItemRangeChanged(position, itemCount)
 
-                with(NotificationManagerCompat.from(appContext)) {
-                    // notificationId is a unique int for each notification that you must define.
-                    cancel(curNotification.id)
-                }
-            }
+        with(NotificationManagerCompat.from(context)) {
+            // notificationId is a unique int for each notification that you must define.
+            notify(reminderId, builder.build())
         }
-
-        holder.itemView.findViewById<ImageButton>(R.id.btnEdit).setOnClickListener {
-            val action = HomeFragmentDirections.navigateHomeToEditNotification(curNotification.id)
-
-            Navigation.findNavController(holder.itemView).navigate(action)
-        }
-    }
-
-    override fun getItemCount(): Int {
-        return notificationDataLists.size
     }
 }
