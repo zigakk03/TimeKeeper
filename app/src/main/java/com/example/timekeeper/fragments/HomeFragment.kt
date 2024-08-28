@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timekeeper.adapters.ReminderAdapter
 import com.example.timekeeper.R
+import com.example.timekeeper.adapters.NotificationAdapter
 import com.example.timekeeper.database.ReminderDatabase
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
@@ -36,6 +37,7 @@ class HomeFragment : Fragment() {
             val notificationRecyclerView: RecyclerView = view.findViewById(R.id.rvNotifications)
             notificationRecyclerView.layoutManager = LinearLayoutManager(context)
             val customReminderAdapter = ReminderAdapter(relevantNotifications, requireContext(), lifecycleScope)
+            NotificationAdapter.mainReminderAdapter = customReminderAdapter
             notificationRecyclerView.adapter = customReminderAdapter
         }
 

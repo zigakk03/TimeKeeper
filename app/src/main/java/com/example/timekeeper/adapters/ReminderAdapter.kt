@@ -2,6 +2,7 @@ package com.example.timekeeper.adapters
 
 import android.content.Context
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -70,5 +71,13 @@ class ReminderAdapter(
 
     override fun getItemCount(): Int {
         return reminderDataLists.size
+    }
+
+    fun removeAndUpdateList(id: Int){
+        val reminder = reminderDataLists.find { it.id == id }
+        val position = reminderDataLists.indexOf(reminder)
+        reminderDataLists.removeAt(position)
+        notifyItemRemoved(position)
+        notifyItemRangeChanged(position, itemCount)
     }
 }

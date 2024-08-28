@@ -11,8 +11,11 @@ import androidx.core.app.NotificationManagerCompat
 import com.example.timekeeper.App
 import com.example.timekeeper.MainActivity
 import com.example.timekeeper.R
+import com.example.timekeeper.helpers.NotificationDismissReceiver
 
 object NotificationAdapter {
+    var mainReminderAdapter: ReminderAdapter? = null
+
     @SuppressLint("MissingPermission")
     fun createAndShowNotification(
         context: Context,
@@ -29,13 +32,12 @@ object NotificationAdapter {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
         )
 
-        // TODO - investigate why it isn't deleting
         val deleteIntent = Intent(context, NotificationDismissReceiver::class.java).apply{
             putExtra("reminder_id", reminderId)
         }
-        val pendingDeleteIntent = PendingIntent.getActivity(
+        val pendingDeleteIntent = PendingIntent.getBroadcast(
             context,
-            2,
+            reminderId,
             deleteIntent,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
         )

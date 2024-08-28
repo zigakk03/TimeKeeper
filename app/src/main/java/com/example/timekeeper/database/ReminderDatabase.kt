@@ -24,7 +24,9 @@ abstract class ReminderDatabase: RoomDatabase() {
                     context.applicationContext,
                     ReminderDatabase::class.java,
                     "notifications"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }
