@@ -39,21 +39,28 @@ class EditReminderFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_edit_notification, container, false)
 
+        // Variable of the colorButton background color
         var colorButton = ContextCompat.getColor(requireContext(), R.color.accent)
+        // Gets the navigation arguments
         val args: EditReminderFragmentArgs by navArgs()
         lifecycleScope.launch {
-            //database setup
+            // Database setup
             val db = ReminderDatabase.getDatabase(requireContext())
             val notifDao = db.reminderDao()
+            // Gets a reminder based on the given id
             val selectedNotification = notifDao.getReminder(args.notificationId)
 
+            // Sets the colorButton to color of the gotten reminder
             colorButton = Color.parseColor(selectedNotification.color)
+            // Fills the views with the gotten reminder
             view.findViewById<ImageButton>(R.id.btnColorPicker).setBackgroundColor(colorButton)
             view.findViewById<EditText>(R.id.iTxtTitle).setText(selectedNotification.title)
             view.findViewById<EditText>(R.id.iTxtDescription).setText(selectedNotification.description)
         }
 
+        // Set btnColorPicker onClick
         view.findViewById<ImageButton>(R.id.btnColorPicker).setOnClickListener {
+            // Open ColorPickerDialogBuilder
             ColorPickerDialogBuilder
                 .with(context)
                 .setTitle("Choose color")
@@ -61,6 +68,7 @@ class EditReminderFragment : Fragment() {
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(8)
                 .lightnessSliderOnly()
+                // Sets the background color of the colorButton
                 .setPositiveButton(
                     "ok"
                 ) { dialog, selectedColor, allColors ->
@@ -74,16 +82,21 @@ class EditReminderFragment : Fragment() {
                 .show()
         }
 
+        // Set btnSave onClick
         view.findViewById<ImageButton>(R.id.btnSave).setOnClickListener {
-            //database setup
+            // Database setup
             val db = ReminderDatabase.getDatabase(requireContext())
-            val notifDao = db.reminderDao()
+            val reminderDao = db.reminderDao()
             lifecycleScope.launch {
+                // Check if iTxtTitle is empty
                 if (!view.findViewById<EditText>(R.id.iTxtTitle).text.isNullOrEmpty()) {
+                    // Values of a reminder
                     val titleTxt = view.findViewById<EditText>(R.id.iTxtTitle).text.toString()
                     val descriptionTxt = view.findViewById<EditText>(R.id.iTxtDescription).text.toString()
                     val notificationColor = '#'+colorButton.toHexString()
-                    notifDao.upsertReminder(
+
+                    // Updates the reminder
+                    reminderDao.upsertReminder(
                         Reminder(
                         args.notificationId,
                         notificationColor,
@@ -93,6 +106,7 @@ class EditReminderFragment : Fragment() {
                     )
                     )
 
+                    // Updates the notification
                     NotificationAdapter.createAndShowNotification(
                         requireContext(),
                         notificationColor,
@@ -101,11 +115,14 @@ class EditReminderFragment : Fragment() {
                         args.notificationId
                     )
 
+                    // Navigates to the home page
                     Navigation.findNavController(view).navigate(R.id.navigate_editReminder_to_home)
                 }
                 else {
+                    // Find the iTxtTitle view
                     val iTxtTitle = view.findViewById<EditText>(R.id.iTxtTitle)
 
+                    // Sets a new animation
                     val colorAnim = ObjectAnimator.ofArgb(
                         iTxtTitle,
                         "hintTextColor",
@@ -118,8 +135,10 @@ class EditReminderFragment : Fragment() {
                         setEvaluator(ArgbEvaluator())
                     }
 
+                    // Starts the animation
                     colorAnim.start()
 
+                    // Sets the color of the text to black after 2s
                     Handler(Looper.getMainLooper()).postDelayed({
                         iTxtTitle.setHintTextColor(ContextCompat.getColor(requireContext(),
                             R.color.black

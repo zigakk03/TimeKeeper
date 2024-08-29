@@ -28,7 +28,7 @@ class HomeFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
         lifecycleScope.launch {
-            //database setup
+            // Database setup
             val db = ReminderDatabase.getDatabase(requireContext())
             val notifDao = db.reminderDao()
             val relevantNotifications = notifDao.getRelevantReminders()
@@ -37,12 +37,13 @@ class HomeFragment : Fragment() {
             val notificationRecyclerView: RecyclerView = view.findViewById(R.id.rvNotifications)
             notificationRecyclerView.layoutManager = LinearLayoutManager(context)
             val customReminderAdapter = ReminderAdapter(relevantNotifications, requireContext(), lifecycleScope)
-            NotificationAdapter.mainReminderAdapter = customReminderAdapter
             notificationRecyclerView.adapter = customReminderAdapter
+
+            // Set mainReminderAdapter for reference across the app
+            NotificationAdapter.mainReminderAdapter = customReminderAdapter
         }
 
-
-
+        // Set the floating button onClick to navigate to add reminder screen
         view.findViewById<FloatingActionButton>(R.id.fBtnAddNotification).setOnClickListener { Navigation.findNavController(view).navigate(
             R.id.navigate_to_add_reminder
         ) }

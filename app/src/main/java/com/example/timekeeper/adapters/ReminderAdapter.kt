@@ -36,35 +36,43 @@ class ReminderAdapter(
 
     override fun onBindViewHolder(holder: ReminderViewHolder, position: Int) {
         val curReminder = reminderDataLists[position]
+        // If current reminder doesn't have a color, it uses the accent color
         if (!curReminder.color.isNullOrEmpty()){
             holder.itemView.findViewById<View>(R.id.vColorStrip).setBackgroundColor(Color.parseColor(curReminder.color))
         }
+        // Set reminder attributes
         holder.itemView.findViewById<TextView>(R.id.tvTitle).text = curReminder.title
         holder.itemView.findViewById<TextView>(R.id.tvDescription).text = curReminder.description
         holder.itemView.findViewById<TextView>(R.id.tvDate).text = curReminder.dateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
         holder.itemView.findViewById<TextView>(R.id.tvTime).text = curReminder.dateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
 
+        // Set btnDelete onClick
         holder.itemView.findViewById<ImageButton>(R.id.btnDelete).setOnClickListener {
             lifecycleScope.launch {
-                //database setup
+                // Database setup
                 val db = ReminderDatabase.getDatabase(appContext)
                 val reminderDao = db.reminderDao()
+                // Delete the reminder in the database
                 reminderDao.deleteReminder(curReminder)
 
+                // Remove the reminder from the reminderDataLists
                 reminderDataLists.removeAt(position)
+                // Notify the reminder removal
                 notifyItemRemoved(position)
                 notifyItemRangeChanged(position, itemCount)
 
+                // Remove the corresponding notification
                 with(NotificationManagerCompat.from(appContext)) {
-                    // notificationId is a unique int for each notification that you must define.
                     cancel(curReminder.id)
                 }
             }
         }
 
+        // Set btnEdit onClick
         holder.itemView.findViewById<ImageButton>(R.id.btnEdit).setOnClickListener {
+            // Sets the navigation arguments
             val action = HomeFragmentDirections.navigateHomeToEditReminder(curReminder.id)
-
+            // Navigates to edit reminder page
             Navigation.findNavController(holder.itemView).navigate(action)
         }
     }
@@ -73,6 +81,7 @@ class ReminderAdapter(
         return reminderDataLists.size
     }
 
+    // Removes and updates reminderDataLists of the given reminder id
     fun removeAndUpdateList(id: Int){
         val reminder = reminderDataLists.find { it.id == id }
         val position = reminderDataLists.indexOf(reminder)

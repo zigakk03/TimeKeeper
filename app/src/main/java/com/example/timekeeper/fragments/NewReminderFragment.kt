@@ -41,8 +41,11 @@ class NewReminderFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_new_notification, container, false)
 
+        // Variable of the colorButton background color
         var colorButton = ContextCompat.getColor(requireContext(), R.color.accent)
+        // Set btnColorPicker onClick
         view.findViewById<ImageButton>(R.id.btnColorPicker).setOnClickListener {
+            // Open ColorPickerDialogBuilder
             ColorPickerDialogBuilder
                 .with(context)
                 .setTitle("Choose color")
@@ -50,6 +53,7 @@ class NewReminderFragment : Fragment() {
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(8)
                 .lightnessSliderOnly()
+                // Sets the background color of the colorButton
                 .setPositiveButton(
                     "ok"
                 ) { dialog, selectedColor, allColors ->
@@ -63,15 +67,21 @@ class NewReminderFragment : Fragment() {
                 .show()
         }
 
+        // Set btnSave onClick
         view.findViewById<ImageButton>(R.id.btnSave).setOnClickListener {
-            //database setup
+            // Database setup
             val db = ReminderDatabase.getDatabase(requireContext())
             val notificationDao = db.reminderDao()
+
             lifecycleScope.launch {
+                // Check if iTxtTitle is empty
                 if (!view.findViewById<EditText>(R.id.iTxtTitle).text.isNullOrEmpty()) {
+                    // Values of a reminder
                     val titleTxt = view.findViewById<EditText>(R.id.iTxtTitle).text.toString()
                     val descriptionTxt = view.findViewById<EditText>(R.id.iTxtDescription).text.toString()
                     val notificationColor = '#'+colorButton.toHexString()
+
+                    // Inserts a new reminder and gets its id
                     val reminderId = notificationDao.upsertReminder(
                         Reminder(
                         0,
@@ -82,6 +92,7 @@ class NewReminderFragment : Fragment() {
                         )
                     )
 
+                    // Shows a new notification referring to the previously created reminder
                     NotificationAdapter.createAndShowNotification(
                         requireContext(),
                         notificationColor,
@@ -90,11 +101,14 @@ class NewReminderFragment : Fragment() {
                         reminderId.toInt()
                     )
 
+                    // Navigates back to the home page
                     Navigation.findNavController(view).navigate(R.id.navigate_newReminder_to_home)
                 }
                 else {
+                    // Find the iTxtTitle view
                     val iTxtTitle = view.findViewById<EditText>(R.id.iTxtTitle)
 
+                    // Sets a new animation
                     val colorAnim = ObjectAnimator.ofArgb(
                         iTxtTitle,
                         "hintTextColor",
@@ -107,8 +121,10 @@ class NewReminderFragment : Fragment() {
                         setEvaluator(ArgbEvaluator())
                     }
 
+                    // Starts the animation
                     colorAnim.start()
 
+                    // Sets the color of the text to black after 2s
                     Handler(Looper.getMainLooper()).postDelayed({
                         iTxtTitle.setHintTextColor(ContextCompat.getColor(requireContext(),
                             R.color.black

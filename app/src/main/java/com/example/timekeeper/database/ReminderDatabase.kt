@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
+// Initiates the room database
 @Database(
     entities = [Reminder::class],
     version = 1
@@ -25,6 +26,7 @@ abstract class ReminderDatabase: RoomDatabase() {
                     ReminderDatabase::class.java,
                     "notifications"
                 )
+                    // On schema change destroys previous data
                     .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
