@@ -48,6 +48,10 @@ class HomeFragment : Fragment() {
             R.id.navigate_to_add_reminder
         ) }
 
+        view.findViewById<FloatingActionButton>(R.id.fBtnToCalendar).setOnClickListener { Navigation.findNavController(view).navigate(
+            R.id.navigate_home_to_calendar
+        ) }
+
         return view
     }
 
