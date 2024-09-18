@@ -23,6 +23,7 @@ class CalendarAdapter(
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.calendar_cell, parent, false)
 
+        // Multiplies the height of each element by 1/6 to make 6 rows
         view.layoutParams.height = (parent.height * (1/6.toDouble())).toInt()
 
         return CalendarViewHolder(view)
@@ -30,7 +31,9 @@ class CalendarAdapter(
 
     override fun onBindViewHolder(holder: CalendarViewHolder, position: Int) {
         val curDay = daysOfMonth[position]
+        // Sets the day number
         holder.itemView.findViewById<TextView>(R.id.txtCalendarDay).text = curDay.dayString
+        // Checks how to color the day number
         if (curDay.isActive){
             if (curDay.isToday){
                 holder.itemView.findViewById<TextView>(R.id.txtCalendarDay).setTextColor(
