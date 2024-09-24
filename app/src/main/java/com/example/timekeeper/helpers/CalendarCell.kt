@@ -4,5 +4,6 @@ data class CalendarCell(
     val dayString: String,
     val isToday: Boolean,
     val isDayOff: Boolean,
-    val isActive: Boolean
+    val isActive: Boolean,
+    var isSelected: Boolean
 )

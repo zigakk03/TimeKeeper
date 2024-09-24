@@ -1,6 +1,7 @@
 package com.example.timekeeper.adapters
 
 import android.content.Context
+import android.icu.text.Transliterator.Position
 import android.util.LayoutDirection
 import android.view.LayoutInflater
 import android.view.View
@@ -14,8 +15,10 @@ import com.example.timekeeper.helpers.CalendarCell
 
 class CalendarAdapter(
     private val daysOfMonth: MutableList<CalendarCell>,
-    private val appContext: Context,
+    private val appContext: Context
 ): RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder>() {
+
+    private var selectedItemPosition: Int = 0
 
     class CalendarViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
 
@@ -35,6 +38,15 @@ class CalendarAdapter(
         holder.itemView.findViewById<TextView>(R.id.txtCalendarDay).text = curDay.dayString
         // Checks how to color the day number
         if (curDay.isActive){
+            // Checks if the day is selected
+            if (curDay.isSelected) {
+                holder.itemView.findViewById<View>(R.id.vSelectedCircle).visibility = View.VISIBLE
+                selectedItemPosition = holder.adapterPosition
+            }
+            else {
+                holder.itemView.findViewById<View>(R.id.vSelectedCircle).visibility = View.INVISIBLE
+            }
+
             if (curDay.isToday){
                 holder.itemView.findViewById<TextView>(R.id.txtCalendarDay).setTextColor(
                     ContextCompat.getColor(appContext, R.color.accent)
@@ -56,4 +68,16 @@ class CalendarAdapter(
         return daysOfMonth.size
     }
 
+    // Returns single item at given position
+    fun getItem(position: Int): CalendarCell {
+        return daysOfMonth[position]
+    }
+
+    fun updateSelectedPosition(newPosition: Int) {
+        daysOfMonth[selectedItemPosition].isSelected = false
+        notifyItemChanged(selectedItemPosition, daysOfMonth[selectedItemPosition])
+        selectedItemPosition = newPosition
+        daysOfMonth[selectedItemPosition].isSelected = true
+        notifyItemChanged(selectedItemPosition, daysOfMonth[selectedItemPosition])
+    }
 }

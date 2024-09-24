@@ -1,11 +1,11 @@
 package com.example.timekeeper.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -16,32 +16,37 @@ import com.example.timekeeper.adapters.CalendarAdapter
 import com.example.timekeeper.helpers.CalendarCell
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-// Todo - select date
-// Todo - animations
 class CalendarFragment : Fragment() {
 
     // Today's date
-    val today = LocalDate.now()
+    private val today = LocalDate.now()
 
     // Selected month variable - default today's date
-    var selectedMonth = LocalDate.now()
+    private var selectedMonth = LocalDate.now()
+
+    // Selected day variable - default today's date
+    private var selectedDay = LocalDate.now()
 
     // Date format
-    val dateFormat = DateTimeFormatter.ofPattern("yyyy-M-d")
+    private val dateFormat = DateTimeFormatter.ofPattern("yyyy-M-d")
 
     // Gesture detector
-    private lateinit var gestureDetector: GestureDetector
+    private lateinit var swipeGestureDetector: GestureDetector
 
     // Inflated view of the calendar page
     private lateinit var layoutView: View
+
+    // Calendar adapter
+    private lateinit var customCalendarAdapter: CalendarAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -49,7 +54,7 @@ class CalendarFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_calendar, container, false)
         layoutView = view
-        gestureDetector = GestureDetector(requireContext(), SwipeGestureListener())
+        swipeGestureDetector = GestureDetector(requireContext(), SwipeGestureListener())
 
         // Setup of the RecyclerView
         val calendarRecyclerView: RecyclerView = view.findViewById(R.id.rvCalendar)
@@ -64,9 +69,33 @@ class CalendarFragment : Fragment() {
         }
         // On touch listener for swipe mechanic
         calendarRecyclerView.setOnTouchListener { _, event ->
-            gestureDetector.onTouchEvent(event)
-            true
+            swipeGestureDetector.onTouchEvent(event)
+            false
         }
+
+        // On touch listener to select a date
+        val itemTouchListener = object : RecyclerView.OnItemTouchListener {
+            override fun onInterceptTouchEvent(rv: RecyclerView, event: MotionEvent): Boolean {
+                val childView = rv.findChildViewUnder(event.x, event.y)
+                if (childView != null && event.action == MotionEvent.ACTION_UP) {
+                    val position = rv.getChildAdapterPosition(childView)
+                    if (position != RecyclerView.NO_POSITION) {
+                        // Handle the tap on the element at 'position'
+                        onTap(position)
+                    }
+                }
+                return false
+            }
+
+            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
+                // Not handling touch events here
+            }
+
+            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+                // Not used here, but needed for the interface
+            }
+        }
+        calendarRecyclerView.addOnItemTouchListener(itemTouchListener)
 
         // Updates the calendar
         updateCalendar()
@@ -104,6 +133,7 @@ class CalendarFragment : Fragment() {
                         maxDaysOfMonth.toString(),
                         false,
                         false,
+                        false,
                         false
                     )
                 )
@@ -133,7 +163,11 @@ class CalendarFragment : Fragment() {
                         selectedMonth.year.toString() + "-" + selectedMonth.month.value + "-" + day,
                         dateFormat
                     ).dayOfWeek == DayOfWeek.SUNDAY),
-                    true
+                    true,
+                    (LocalDate.parse(
+                        selectedMonth.year.toString() + "-" + selectedMonth.month.value + "-" + day,
+                        dateFormat
+                    ).isEqual(selectedDay))
                 )
             )
         }
@@ -146,6 +180,7 @@ class CalendarFragment : Fragment() {
                     counter.toString(),
                     false,
                     false,
+                    false,
                     false
                 )
             )
@@ -154,7 +189,7 @@ class CalendarFragment : Fragment() {
 
         // Finds the RecyclerView and populates it with data
         val calendarRecyclerView: RecyclerView = layoutView.findViewById(R.id.rvCalendar)
-        val customCalendarAdapter = CalendarAdapter(days, requireContext())
+        customCalendarAdapter = CalendarAdapter(days, requireContext())
         calendarRecyclerView.adapter = customCalendarAdapter
     }
 
@@ -201,5 +236,17 @@ class CalendarFragment : Fragment() {
     private fun onSwipeRight() {
         selectedMonth = selectedMonth.minusMonths(1)
         updateCalendar()
+    }
+
+    // Updates witch day is selected
+    private fun onTap(position: Int) {
+        val item = customCalendarAdapter.getItem(position)
+        if (item.isActive){
+            selectedDay = LocalDate.parse(
+                selectedMonth.year.toString() + "-" + selectedMonth.month.value + "-" + item.dayString,
+                dateFormat
+            )
+            customCalendarAdapter.updateSelectedPosition(position)
+        }
     }
 }
