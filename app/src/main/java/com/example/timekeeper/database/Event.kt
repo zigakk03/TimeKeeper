@@ -5,12 +5,14 @@ import androidx.room.PrimaryKey
 import java.time.LocalDateTime
 
 @Entity
-data class Reminder(
+data class Event(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val color: String?,
     val title: String,
     val description: String,
-    val dateTime: LocalDateTime,
-    val eventId: Int?
-    )
+    val startDateTime: LocalDateTime,
+    val endDateTime: LocalDateTime
+    // Todo - repeat
+    // Todo - notification / reminder
+)

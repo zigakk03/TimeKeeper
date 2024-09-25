@@ -88,7 +88,8 @@ class NewReminderFragment : Fragment() {
                         notificationColor,
                         titleTxt,
                         descriptionTxt,
-                        LocalDateTime.now()
+                        LocalDateTime.now(),
+                            null
                         )
                     )
 

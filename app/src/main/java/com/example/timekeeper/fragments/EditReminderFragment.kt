@@ -102,7 +102,8 @@ class EditReminderFragment : Fragment() {
                         notificationColor,
                         titleTxt,
                         descriptionTxt,
-                        LocalDateTime.now()
+                        LocalDateTime.now(),
+                            null
                     )
                     )
 
