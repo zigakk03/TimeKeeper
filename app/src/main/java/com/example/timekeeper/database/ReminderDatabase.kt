@@ -12,7 +12,7 @@ import androidx.room.TypeConverters
         Reminder::class,
         Event::class
                ],
-    version = 2
+    version = 3
 )
 @TypeConverters(DateTimeConverters::class)
 abstract class ReminderDatabase: RoomDatabase() {

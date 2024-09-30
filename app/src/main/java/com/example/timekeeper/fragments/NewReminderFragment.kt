@@ -6,11 +6,14 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.Switch
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -28,6 +31,8 @@ import java.time.LocalDateTime
 
 class NewReminderFragment : Fragment() {
 
+    private lateinit var view: View
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -39,7 +44,7 @@ class NewReminderFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_new_notification, container, false)
+        view = inflater.inflate(R.layout.fragment_new_notification, container, false)
 
         // Variable of the colorButton background color
         var colorButton = ContextCompat.getColor(requireContext(), R.color.accent)
@@ -135,6 +140,89 @@ class NewReminderFragment : Fragment() {
             }
         }
 
+        view.findViewById<Switch>(R.id.swSelection).setOnCheckedChangeListener { switchView, isChecked ->
+            switchSelection(isChecked)
+        }
+
         return view
+    }
+
+    fun switchSelection(isChecked: Boolean){
+        if (isChecked){
+            view.findViewById<View>(R.id.vContainer1).alpha = 1.0F
+            view.findViewById<View>(R.id.vContainer2).alpha = 1.0F
+            view.findViewById<View>(R.id.vLine1).alpha = 1.0F
+            view.findViewById<View>(R.id.vLine2).alpha = 1.0F
+            view.findViewById<View>(R.id.vLine3).alpha = 1.0F
+            view.findViewById<View>(R.id.vClockIcon).alpha = 1.0F
+            view.findViewById<TextView>(R.id.txtStart).alpha = 1.0F
+            view.findViewById<TextView>(R.id.txtEnd).alpha = 1.0F
+            view.findViewById<TextView>(R.id.txtStartDate).alpha = 1.0F
+            view.findViewById<TextView>(R.id.txtEndDate).alpha = 1.0F
+            view.findViewById<TextView>(R.id.txtRepeat).alpha = 1.0F
+            view.findViewById<TextView>(R.id.txtRepeatText).alpha = 1.0F
+            view.findViewById<TextView>(R.id.txtEventReminderTime).alpha = 1.0F
+            view.findViewById<TextView>(R.id.txtEventReminderTimeText).alpha = 1.0F
+            view.findViewById<ImageButton>(R.id.btnStartDate).apply {
+                alpha = 1.0F
+                isClickable = true
+            }
+            view.findViewById<ImageButton>(R.id.btnEndDate).apply {
+                alpha = 1.0F
+                isClickable = true
+            }
+            view.findViewById<ImageButton>(R.id.btnRepeat).apply {
+                alpha = 1.0F
+                isClickable = true
+            }
+            view.findViewById<ImageButton>(R.id.btnEventReminderTime).apply {
+                alpha = 1.0F
+                isClickable = true
+            }
+            view.findViewById<Switch>(R.id.swIncludesTime).apply {
+                alpha = 1.0F
+                isClickable = true
+            }
+
+            view.findViewById<TextView>(R.id.txtTitle).setText(R.string.add_page_title2)
+        }
+        else {
+            view.findViewById<View>(R.id.vContainer1).alpha = 0.5F
+            view.findViewById<View>(R.id.vContainer2).alpha = 0.5F
+            view.findViewById<View>(R.id.vLine1).alpha = 0.5F
+            view.findViewById<View>(R.id.vLine2).alpha = 0.5F
+            view.findViewById<View>(R.id.vLine3).alpha = 0.5F
+            view.findViewById<View>(R.id.vClockIcon).alpha = 0.5F
+            view.findViewById<TextView>(R.id.txtStart).alpha = 0.5F
+            view.findViewById<TextView>(R.id.txtEnd).alpha = 0.5F
+            view.findViewById<TextView>(R.id.txtStartDate).alpha = 0.5F
+            view.findViewById<TextView>(R.id.txtEndDate).alpha = 0.5F
+            view.findViewById<TextView>(R.id.txtRepeat).alpha = 0.5F
+            view.findViewById<TextView>(R.id.txtRepeatText).alpha = 0.5F
+            view.findViewById<TextView>(R.id.txtEventReminderTime).alpha = 0.5F
+            view.findViewById<TextView>(R.id.txtEventReminderTimeText).alpha = 0.5F
+            view.findViewById<ImageButton>(R.id.btnStartDate).apply {
+                alpha = 0.5F
+                isClickable = false
+            }
+            view.findViewById<ImageButton>(R.id.btnEndDate).apply {
+                alpha = 0.5F
+                isClickable = false
+            }
+            view.findViewById<ImageButton>(R.id.btnRepeat).apply {
+                alpha = 0.5F
+                isClickable = false
+            }
+            view.findViewById<ImageButton>(R.id.btnEventReminderTime).apply {
+                alpha = 0.5F
+                isClickable = false
+            }
+            view.findViewById<Switch>(R.id.swIncludesTime).apply {
+                alpha = 0.5F
+                isClickable = false
+            }
+
+            view.findViewById<TextView>(R.id.txtTitle).setText(R.string.add_page_title1)
+        }
     }
 }

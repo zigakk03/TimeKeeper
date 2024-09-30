@@ -180,4 +180,271 @@
         app:layout_constraintEnd_toEndOf="@+id/vSelection"
         app:layout_constraintTop_toTopOf="@+id/vSelection" />
 
+    <View
+        android:id="@+id/vContainer1"
+        android:layout_width="0dp"
+        android:layout_height="130dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
+        android:alpha="0.5"
+        android:background="@drawable/rounded_corners"
+        android:elevation="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vSelection" />
+
+    <View
+        android:id="@+id/vLine1"
+        android:layout_width="0dp"
+        android:layout_height="3dp"
+        android:alpha="0.5"
+        android:background="@color/silver"
+        android:elevation="2dp"
+        app:layout_constraintBottom_toBottomOf="@+id/vContainer1"
+        app:layout_constraintEnd_toEndOf="@+id/vContainer1"
+        app:layout_constraintStart_toStartOf="@+id/vContainer1"
+        app:layout_constraintTop_toTopOf="@+id/vContainer1"
+        app:layout_constraintVertical_bias="0.666666" />
+
+    <View
+        android:id="@+id/vLine3"
+        android:layout_width="0dp"
+        android:layout_height="3dp"
+        android:alpha="0.5"
+        android:background="@color/silver"
+        android:elevation="2dp"
+        app:layout_constraintBottom_toBottomOf="@+id/vContainer1"
+        app:layout_constraintEnd_toEndOf="@+id/vContainer1"
+        app:layout_constraintStart_toStartOf="@+id/vContainer1"
+        app:layout_constraintTop_toTopOf="@+id/vContainer1"
+        app:layout_constraintVertical_bias="0.333333" />
+
+    <TextView
+        android:id="@+id/txtStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:alpha="0.5"
+        android:elevation="2dp"
+        android:text="Start:"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/vLine1"
+        app:layout_constraintStart_toStartOf="@+id/vContainer1"
+        app:layout_constraintTop_toBottomOf="@+id/vLine3" />
+
+    <TextView
+        android:id="@+id/txtEnd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:alpha="0.5"
+        android:elevation="2dp"
+        android:text="End:"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/vContainer1"
+        app:layout_constraintStart_toStartOf="@+id/vContainer1"
+        app:layout_constraintTop_toBottomOf="@+id/vLine1" />
+
+    <TextView
+        android:id="@+id/txtStartDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="0.5"
+        android:elevation="2dp"
+        android:text="TextView"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/vLine1"
+        app:layout_constraintEnd_toEndOf="@+id/vContainer1"
+        app:layout_constraintStart_toStartOf="@+id/vContainer1"
+        app:layout_constraintTop_toBottomOf="@+id/vLine3" />
+
+    <TextView
+        android:id="@+id/txtEndDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="0.5"
+        android:elevation="2dp"
+        android:text="TextView"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/vContainer1"
+        app:layout_constraintEnd_toEndOf="@+id/vContainer1"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/vContainer1"
+        app:layout_constraintTop_toBottomOf="@+id/vLine1" />
+
+    <ImageButton
+        android:id="@+id/btnStartDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:alpha="0.5"
+        android:background="@color/empty"
+        android:clickable="false"
+        android:elevation="2dp"
+        android:src="@drawable/baseline_edit_square_30"
+        app:layout_constraintBottom_toTopOf="@+id/vLine1"
+        app:layout_constraintEnd_toEndOf="@+id/vContainer1"
+        app:layout_constraintTop_toBottomOf="@+id/vLine3" />
+
+    <ImageButton
+        android:id="@+id/btnEndDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:alpha="0.5"
+        android:background="@color/empty"
+        android:clickable="false"
+        android:elevation="2dp"
+        android:src="@drawable/baseline_edit_square_30"
+        app:layout_constraintBottom_toBottomOf="@+id/vContainer1"
+        app:layout_constraintEnd_toEndOf="@+id/vContainer1"
+        app:layout_constraintTop_toBottomOf="@+id/vLine1" />
+
+
+    <View
+        android:id="@+id/vContainer2"
+        android:layout_width="0dp"
+        android:layout_height="86dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
+        android:alpha="0.5"
+        android:background="@drawable/rounded_corners"
+        android:elevation="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vContainer1" />
+
+    <View
+        android:id="@+id/vLine2"
+        android:layout_width="0dp"
+        android:layout_height="3dp"
+        android:alpha="0.5"
+        android:background="@color/silver"
+        android:elevation="2dp"
+        app:layout_constraintBottom_toBottomOf="@+id/vContainer2"
+        app:layout_constraintEnd_toEndOf="@+id/vContainer2"
+        app:layout_constraintStart_toStartOf="@+id/vContainer2"
+        app:layout_constraintTop_toTopOf="@+id/vContainer2" />
+
+    <TextView
+        android:id="@+id/txtRepeat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:alpha="0.5"
+        android:elevation="2dp"
+        android:text="Repeat:"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/vLine2"
+        app:layout_constraintStart_toStartOf="@+id/vContainer2"
+        app:layout_constraintTop_toTopOf="@+id/vContainer2" />
+
+    <TextView
+        android:id="@+id/txtEventReminderTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:alpha="0.5"
+        android:elevation="2dp"
+        android:text="Notification:"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/vContainer2"
+        app:layout_constraintStart_toStartOf="@+id/vContainer2"
+        app:layout_constraintTop_toBottomOf="@+id/vLine2" />
+
+    <TextView
+        android:id="@+id/txtRepeatText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="0.5"
+        android:elevation="2dp"
+        android:text="TextView"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/vLine2"
+        app:layout_constraintEnd_toEndOf="@+id/vContainer2"
+        app:layout_constraintStart_toStartOf="@+id/vContainer2"
+        app:layout_constraintTop_toTopOf="@+id/vContainer2" />
+
+    <TextView
+        android:id="@+id/txtEventReminderTimeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="0.5"
+        android:elevation="2dp"
+        android:text="TextView"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/vContainer2"
+        app:layout_constraintEnd_toEndOf="@+id/vContainer2"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/vContainer2"
+        app:layout_constraintTop_toBottomOf="@+id/vLine2" />
+
+    <ImageButton
+        android:id="@+id/btnRepeat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:alpha="0.5"
+        android:background="@color/empty"
+        android:clickable="false"
+        android:elevation="2dp"
+        android:src="@drawable/baseline_edit_square_30"
+        app:layout_constraintBottom_toTopOf="@+id/vLine2"
+        app:layout_constraintEnd_toEndOf="@+id/vContainer2"
+        app:layout_constraintTop_toTopOf="@+id/vContainer2" />
+
+    <ImageButton
+        android:id="@+id/btnEventReminderTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:alpha="0.5"
+        android:background="@color/empty"
+        android:clickable="false"
+        android:elevation="2dp"
+        android:src="@drawable/baseline_edit_square_30"
+        app:layout_constraintBottom_toBottomOf="@+id/vContainer2"
+        app:layout_constraintEnd_toEndOf="@+id/vContainer2"
+        app:layout_constraintTop_toBottomOf="@+id/vLine2" />
+
+    <Switch
+        android:id="@+id/swIncludesTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:alpha="0.5"
+        android:clickable="false"
+        android:elevation="2dp"
+        android:thumb="@drawable/custom_thumb_color_switch"
+        android:track="@drawable/custom_track"
+        app:layout_constraintBottom_toTopOf="@+id/vLine3"
+        app:layout_constraintEnd_toEndOf="@+id/vContainer1"
+        app:layout_constraintTop_toTopOf="@+id/vContainer1" />
+
+    <View
+        android:id="@+id/vClockIcon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="16dp"
+        android:alpha="0.5"
+        android:background="@drawable/baseline_access_time_30"
+        android:elevation="2dp"
+        app:layout_constraintBottom_toTopOf="@+id/vLine3"
+        app:layout_constraintStart_toStartOf="@+id/vContainer1"
+        app:layout_constraintTop_toTopOf="@+id/vContainer1" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
