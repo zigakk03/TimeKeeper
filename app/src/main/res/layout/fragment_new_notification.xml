@@ -256,13 +256,13 @@
         android:layout_height="wrap_content"
         android:alpha="0.5"
         android:elevation="2dp"
-        android:text="TextView"
         android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/vLine1"
         app:layout_constraintEnd_toEndOf="@+id/vContainer1"
         app:layout_constraintStart_toStartOf="@+id/vContainer1"
-        app:layout_constraintTop_toBottomOf="@+id/vLine3" />
+        app:layout_constraintTop_toBottomOf="@+id/vLine3"
+        tools:text="txtStartDate" />
 
     <TextView
         android:id="@+id/txtEndDate"
@@ -270,14 +270,14 @@
         android:layout_height="wrap_content"
         android:alpha="0.5"
         android:elevation="2dp"
-        android:text="TextView"
         android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="@+id/vContainer1"
         app:layout_constraintEnd_toEndOf="@+id/vContainer1"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/vContainer1"
-        app:layout_constraintTop_toBottomOf="@+id/vLine1" />
+        app:layout_constraintTop_toBottomOf="@+id/vLine1"
+        tools:text="txtEndDate" />
 
     <ImageButton
         android:id="@+id/btnStartDate"
@@ -366,32 +366,35 @@
 
     <TextView
         android:id="@+id/txtRepeatText"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:alpha="0.5"
         android:elevation="2dp"
-        android:text="TextView"
         android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/vLine2"
-        app:layout_constraintEnd_toEndOf="@+id/vContainer2"
-        app:layout_constraintStart_toStartOf="@+id/vContainer2"
-        app:layout_constraintTop_toTopOf="@+id/vContainer2" />
+        app:layout_constraintEnd_toStartOf="@+id/btnRepeat"
+        app:layout_constraintStart_toEndOf="@+id/txtRepeat"
+        app:layout_constraintTop_toTopOf="@+id/vContainer2"
+        tools:text="txtRepeat" />
 
     <TextView
         android:id="@+id/txtEventReminderTimeText"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:alpha="0.5"
         android:elevation="2dp"
-        android:text="TextView"
         android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="@+id/vContainer2"
-        app:layout_constraintEnd_toEndOf="@+id/vContainer2"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/vContainer2"
-        app:layout_constraintTop_toBottomOf="@+id/vLine2" />
+        app:layout_constraintEnd_toStartOf="@+id/btnEventReminderTime"
+        app:layout_constraintStart_toEndOf="@+id/txtEventReminderTime"
+        app:layout_constraintTop_toBottomOf="@+id/vLine2"
+        tools:text="txtNotification" />
 
     <ImageButton
         android:id="@+id/btnRepeat"

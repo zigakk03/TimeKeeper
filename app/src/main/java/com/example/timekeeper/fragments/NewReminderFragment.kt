@@ -2,6 +2,9 @@ package com.example.timekeeper.fragments
 
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -26,17 +29,27 @@ import com.example.timekeeper.database.ReminderDatabase
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
 
 
 class NewReminderFragment : Fragment() {
 
     private lateinit var view: View
 
+    private var startDate: LocalDate = LocalDate.now()
+    private var startTime: LocalTime = LocalTime.now()
+    private var endDate: LocalDate = LocalDate.now()
+    private var endTime: LocalTime = LocalTime.now()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 
+    @SuppressLint("SetTextI18n")
     @OptIn(ExperimentalStdlibApi::class)
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -144,10 +157,58 @@ class NewReminderFragment : Fragment() {
             switchSelection(isChecked)
         }
 
+        view.findViewById<ImageButton>(R.id.btnStartDate).setOnClickListener {
+            val datePickerDialog = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
+                // Update the TextView with the selected date
+                startDate = LocalDate.parse("$selectedDay/${selectedMonth + 1}/$selectedYear", DateTimeFormatter.ofPattern("d/M/y"))
+                if (view.findViewById<Switch>(R.id.swIncludesTime).isChecked){
+                    val timePickerDialog = TimePickerDialog(requireContext(), { _, selectedHour, selectedMinute ->
+                        startTime = LocalTime.parse("$selectedHour/$selectedMinute", DateTimeFormatter.ofPattern("H/m"))
+                        view.findViewById<TextView>(R.id.txtStartDate).text = (startTime.format(
+                            DateTimeFormatter.ofPattern("HH:mm")) + "    " + startDate.format(
+                            DateTimeFormatter.ofPattern("d. M. yyyy")))
+                    }, startTime.hour, startTime.minute, true)
+                    timePickerDialog.show()
+                }
+                else {
+                    view.findViewById<TextView>(R.id.txtStartDate).setText(startDate.format(
+                        DateTimeFormatter.ofPattern("d. M. yyyy")))
+                }
+            }, startDate.year, startDate.monthValue-1, startDate.dayOfMonth)
+
+            datePickerDialog.datePicker.firstDayOfWeek = Calendar.MONDAY
+
+            datePickerDialog.show()
+        }
+
+        view.findViewById<ImageButton>(R.id.btnEndDate).setOnClickListener {
+            val datePickerDialog = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
+                // Update the TextView with the selected date
+                endDate = LocalDate.parse("$selectedDay/${selectedMonth + 1}/$selectedYear", DateTimeFormatter.ofPattern("d/M/y"))
+                if (view.findViewById<Switch>(R.id.swIncludesTime).isChecked){
+                    val timePickerDialog = TimePickerDialog(requireContext(), { _, selectedHour, selectedMinute ->
+                        endTime = LocalTime.parse("$selectedHour/$selectedMinute", DateTimeFormatter.ofPattern("H/m"))
+                        view.findViewById<TextView>(R.id.txtEndDate).text = (endTime.format(
+                            DateTimeFormatter.ofPattern("HH:mm")) + "    " + endDate.format(
+                            DateTimeFormatter.ofPattern("d. M. yyyy")))
+                    }, endTime.hour, endTime.minute, true)
+                    timePickerDialog.show()
+                }
+                else {
+                    view.findViewById<TextView>(R.id.txtEndDate).setText(endDate.format(
+                        DateTimeFormatter.ofPattern("d. M. yyyy")))
+                }
+            }, endDate.year, endDate.monthValue-1, endDate.dayOfMonth)
+
+            datePickerDialog.datePicker.firstDayOfWeek = Calendar.MONDAY
+
+            datePickerDialog.show()
+        }
+
         return view
     }
 
-    fun switchSelection(isChecked: Boolean){
+    private fun switchSelection(isChecked: Boolean){
         if (isChecked){
             view.findViewById<View>(R.id.vContainer1).alpha = 1.0F
             view.findViewById<View>(R.id.vContainer2).alpha = 1.0F
