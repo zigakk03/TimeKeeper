@@ -8,4 +8,24 @@
     <style name="Theme.TimeKeeper" parent="Base.Theme.TimeKeeper" >
         <item name="floatingActionButtonPrimaryStyle">@color/black</item>
     </style>
+    
+    <style name="CustomDatePickerDialog" parent="Theme.MaterialComponents.Dialog">
+        <item name="colorAccent">@color/accent</item>
+        <!--selected Item color-->
+        <item name="colorControlActivated">@color/accent</item>
+        <!-- Highlight item color-->
+        <item name="colorControlHighlight">@color/empty</item>
+        <!--Calender Background color -->
+        <item name="android:windowBackground">@drawable/rounded_corners_dark</item>
+        <!-- Ok Cancel Color-->
+        <item name="android:textColor">@color/alert</item>
+        <!-- Week TextColor-->
+        <item name="android:textColorSecondary">@color/accent</item>
+        <!-- Calender Number color arrow color (< >) -->
+        <item name="android:textColorPrimary">@color/white</item>
+        <!--day , month-->
+        <item name="android:textColorPrimaryInverse">@color/white</item>
+        <item name="colorButtonNormal">@color/accent</item>
+
+    </style>
 </resources>
