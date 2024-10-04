@@ -163,16 +163,25 @@ class NewReminderFragment : Fragment() {
         }
 
         view.findViewById<ImageButton>(R.id.btnStartDate).setOnClickListener {
-            val datePickerDialog = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
+            val datePickerDialog = DatePickerDialog(requireContext(), R.style.CustomDatePickerDialog, { _, selectedYear, selectedMonth, selectedDay ->
                 // Update the TextView with the selected date
                 startDate = LocalDate.parse("$selectedDay/${selectedMonth + 1}/$selectedYear", DateTimeFormatter.ofPattern("d/M/y"))
                 if (endDate < startDate) {
-                    endDate = startDate
-                    view.findViewById<TextView>(R.id.txtEndDate).setText(endDate.format(
-                        DateTimeFormatter.ofPattern("d. M. yyyy")))
+                    if (view.findViewById<Switch>(R.id.swIncludesTime).isChecked){
+                        endDate = startDate
+                        endTime = startTime
+                        view.findViewById<TextView>(R.id.txtEndDate).text = (endTime.format(
+                            DateTimeFormatter.ofPattern("HH:mm")) + "    " + endDate.format(
+                            DateTimeFormatter.ofPattern("d. M. yyyy")))
+                    }
+                    else {
+                        endDate = startDate
+                        view.findViewById<TextView>(R.id.txtEndDate).setText(endDate.format(
+                            DateTimeFormatter.ofPattern("d. M. yyyy")))
+                    }
                 }
                 if (view.findViewById<Switch>(R.id.swIncludesTime).isChecked){
-                    val timePickerDialog = TimePickerDialog(requireContext(), { _, selectedHour, selectedMinute ->
+                    val timePickerDialog = TimePickerDialog(requireContext(), R.style.CustomTimePickerDialog, { _, selectedHour, selectedMinute ->
                         startTime = LocalTime.parse("$selectedHour/$selectedMinute", DateTimeFormatter.ofPattern("H/m"))
                         if (startDate == endDate && endTime < startTime){
                             endTime = startTime
