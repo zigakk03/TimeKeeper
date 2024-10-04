@@ -214,7 +214,7 @@ class NewReminderFragment : Fragment() {
                     endDate = startDate
                 }
                 if (view.findViewById<Switch>(R.id.swIncludesTime).isChecked){
-                    val timePickerDialog = TimePickerDialog(requireContext(), { _, selectedHour, selectedMinute ->
+                    val timePickerDialog = TimePickerDialog(requireContext(), R.style.CustomTimePickerDialog, { _, selectedHour, selectedMinute ->
                         endTime = LocalTime.parse("$selectedHour/$selectedMinute", DateTimeFormatter.ofPattern("H/m"))
                         if (startDate == endDate && endTime < startTime){
                             endTime = startTime
