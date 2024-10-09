@@ -47,4 +47,11 @@
         <item name="android:numbersBackgroundColor">@color/gray</item>
         <item name="android:background">@color/jet</item>
     </style>
+
+    <style name="RecurrenceDialog" parent="android:Theme.Material.Dialog.Alert">
+        <item name="android:headerBackground">@color/black</item>
+        <item name="android:background">@color/jet</item>
+        <item name="android:windowBackground">@drawable/rounded_corners_dark</item>
+        <item name="colorOnPrimary">@color/accent</item>
+    </style>
 </resources>

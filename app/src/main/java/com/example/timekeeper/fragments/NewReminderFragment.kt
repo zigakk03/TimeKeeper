@@ -26,6 +26,7 @@ import com.example.timekeeper.R
 import com.example.timekeeper.adapters.NotificationAdapter
 import com.example.timekeeper.database.Reminder
 import com.example.timekeeper.database.ReminderDatabase
+import com.example.timekeeper.helpers.RecurrenceDialog
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
 import kotlinx.coroutines.launch
@@ -63,6 +64,14 @@ class NewReminderFragment : Fragment() {
             DateTimeFormatter.ofPattern("d. M. yyyy")))
         view.findViewById<TextView>(R.id.txtEndDate).setText(endDate.format(
             DateTimeFormatter.ofPattern("d. M. yyyy")))
+
+
+        // test zone
+        val recurrenceDialog = RecurrenceDialog()
+        recurrenceDialog.show(childFragmentManager,"RecurrenceDialog")
+        // test zone
+
+
 
         // Variable of the colorButton background color
         var colorButton = ContextCompat.getColor(requireContext(), R.color.accent)
