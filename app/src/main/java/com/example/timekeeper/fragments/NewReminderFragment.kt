@@ -64,14 +64,8 @@ class NewReminderFragment : Fragment() {
             DateTimeFormatter.ofPattern("d. M. yyyy")))
         view.findViewById<TextView>(R.id.txtEndDate).setText(endDate.format(
             DateTimeFormatter.ofPattern("d. M. yyyy")))
-
-
-        // test zone
-        val recurrenceDialog = RecurrenceDialog()
-        recurrenceDialog.show(childFragmentManager,"RecurrenceDialog")
-        // test zone
-
-
+        // Disables the buttons
+        switchSelection(false)
 
         // Variable of the colorButton background color
         var colorButton = ContextCompat.getColor(requireContext(), R.color.accent)
@@ -167,10 +161,12 @@ class NewReminderFragment : Fragment() {
             }
         }
 
+        // Sets the selection switch function
         view.findViewById<Switch>(R.id.swSelection).setOnCheckedChangeListener { switchView, isChecked ->
             switchSelection(isChecked)
         }
 
+        // Start date button
         view.findViewById<ImageButton>(R.id.btnStartDate).setOnClickListener {
             val datePickerDialog = DatePickerDialog(requireContext(), R.style.CustomDatePickerDialog, { _, selectedYear, selectedMonth, selectedDay ->
                 // Update the TextView with the selected date
@@ -215,6 +211,7 @@ class NewReminderFragment : Fragment() {
             datePickerDialog.show()
         }
 
+        // End date button
         view.findViewById<ImageButton>(R.id.btnEndDate).setOnClickListener {
             val datePickerDialog = DatePickerDialog(requireContext(), R.style.CustomDatePickerDialog, { _, selectedYear, selectedMonth, selectedDay ->
                 // Update the TextView with the selected date
@@ -245,7 +242,9 @@ class NewReminderFragment : Fragment() {
             datePickerDialog.show()
         }
 
+        // Sets the time switch function
         view.findViewById<Switch>(R.id.swIncludesTime).setOnCheckedChangeListener { switchView, isChecked ->
+            // Displays the correct format based on the switches state
             if (isChecked) {
                 view.findViewById<TextView>(R.id.txtStartDate).text = (startTime.format(
                     DateTimeFormatter.ofPattern("HH:mm")) + "    " + startDate.format(
@@ -264,9 +263,17 @@ class NewReminderFragment : Fragment() {
             }
         }
 
+        // Sets the repeat button on click
+        view.findViewById<ImageButton>(R.id.btnRepeat).setOnClickListener {
+            val recurrenceDialog = RecurrenceDialog(startDate)
+            // Shows the recurrence dialog
+            recurrenceDialog.show(childFragmentManager,"RecurrenceDialog")
+        }
+
         return view
     }
 
+    // Function switches the opacity and if the buttons are enabled
     private fun switchSelection(isChecked: Boolean){
         if (isChecked){
             view.findViewById<View>(R.id.vContainer1).alpha = 1.0F
@@ -285,23 +292,23 @@ class NewReminderFragment : Fragment() {
             view.findViewById<TextView>(R.id.txtEventReminderTimeText).alpha = 1.0F
             view.findViewById<ImageButton>(R.id.btnStartDate).apply {
                 alpha = 1.0F
-                isClickable = true
+                isEnabled = true
             }
             view.findViewById<ImageButton>(R.id.btnEndDate).apply {
                 alpha = 1.0F
-                isClickable = true
+                isEnabled = true
             }
             view.findViewById<ImageButton>(R.id.btnRepeat).apply {
                 alpha = 1.0F
-                isClickable = true
+                isEnabled = true
             }
             view.findViewById<ImageButton>(R.id.btnEventReminderTime).apply {
                 alpha = 1.0F
-                isClickable = true
+                isEnabled = true
             }
             view.findViewById<Switch>(R.id.swIncludesTime).apply {
                 alpha = 1.0F
-                isClickable = true
+                isEnabled = true
             }
 
             view.findViewById<TextView>(R.id.txtTitle).setText(R.string.add_page_title2)
@@ -323,23 +330,23 @@ class NewReminderFragment : Fragment() {
             view.findViewById<TextView>(R.id.txtEventReminderTimeText).alpha = 0.5F
             view.findViewById<ImageButton>(R.id.btnStartDate).apply {
                 alpha = 0.5F
-                isClickable = false
+                isEnabled = false
             }
             view.findViewById<ImageButton>(R.id.btnEndDate).apply {
                 alpha = 0.5F
-                isClickable = false
+                isEnabled = false
             }
             view.findViewById<ImageButton>(R.id.btnRepeat).apply {
                 alpha = 0.5F
-                isClickable = false
+                isEnabled = false
             }
             view.findViewById<ImageButton>(R.id.btnEventReminderTime).apply {
                 alpha = 0.5F
-                isClickable = false
+                isEnabled = false
             }
             view.findViewById<Switch>(R.id.swIncludesTime).apply {
                 alpha = 0.5F
-                isClickable = false
+                isEnabled = false
             }
 
             view.findViewById<TextView>(R.id.txtTitle).setText(R.string.add_page_title1)

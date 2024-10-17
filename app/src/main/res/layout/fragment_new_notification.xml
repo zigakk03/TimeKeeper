@@ -72,7 +72,8 @@
         android:src="@drawable/outline_keyboard_arrow_up_50"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/vHeader" />
+        app:layout_constraintTop_toBottomOf="@+id/vHeader"
+        tools:ignore="TouchTargetSizeCheck" />
 
     <EditText
         android:id="@+id/iTxtTitle"
@@ -92,7 +93,8 @@
         app:layout_constraintBottom_toBottomOf="@+id/vTitle"
         app:layout_constraintEnd_toEndOf="@+id/vTitle"
         app:layout_constraintStart_toStartOf="@+id/vTitle"
-        app:layout_constraintTop_toTopOf="@+id/vTitle" />
+        app:layout_constraintTop_toTopOf="@+id/vTitle"
+        tools:ignore="Autofill" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clDescription"
@@ -116,13 +118,15 @@
             android:gravity="start|top"
             android:hint="@string/i_txt_notification_description"
             android:inputType="textMultiLine"
+            android:minHeight="48dp"
             android:textColor="@color/black"
             android:textColorHint="@color/black"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="Autofill" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -150,7 +154,8 @@
         app:layout_constraintBottom_toBottomOf="@+id/vSelection"
         app:layout_constraintEnd_toEndOf="@+id/vSelection"
         app:layout_constraintStart_toStartOf="@+id/vSelection"
-        app:layout_constraintTop_toTopOf="@+id/vSelection" />
+        app:layout_constraintTop_toTopOf="@+id/vSelection"
+        tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
 
     <TextView
         android:id="@+id/txtReminder"
@@ -158,7 +163,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:elevation="2dp"
-        android:text="Reminder"
+        android:text="@string/add_reminder_reminder"
         android:textAlignment="viewStart"
         android:textColor="@color/black"
         android:textSize="24sp"
@@ -172,7 +177,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
         android:elevation="2dp"
-        android:text="Event"
+        android:text="@string/add_reminder_event"
         android:textAlignment="viewEnd"
         android:textColor="@color/black"
         android:textSize="24sp"
@@ -227,7 +232,7 @@
         android:layout_marginStart="16dp"
         android:alpha="0.5"
         android:elevation="2dp"
-        android:text="Start:"
+        android:text="@string/add_reminder_start_date"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -242,7 +247,7 @@
         android:layout_marginStart="16dp"
         android:alpha="0.5"
         android:elevation="2dp"
-        android:text="End:"
+        android:text="@string/add_reminder_end_date"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -286,12 +291,13 @@
         android:layout_marginEnd="16dp"
         android:alpha="0.5"
         android:background="@color/empty"
-        android:clickable="false"
+        android:contentDescription="@string/add_reminder_select_start_date"
         android:elevation="2dp"
         android:src="@drawable/baseline_edit_square_30"
         app:layout_constraintBottom_toTopOf="@+id/vLine1"
         app:layout_constraintEnd_toEndOf="@+id/vContainer1"
-        app:layout_constraintTop_toBottomOf="@+id/vLine3" />
+        app:layout_constraintTop_toBottomOf="@+id/vLine3"
+        tools:ignore="TouchTargetSizeCheck" />
 
     <ImageButton
         android:id="@+id/btnEndDate"
@@ -300,12 +306,13 @@
         android:layout_marginEnd="16dp"
         android:alpha="0.5"
         android:background="@color/empty"
-        android:clickable="false"
+        android:contentDescription="@string/add_reminder_select_end_date"
         android:elevation="2dp"
         android:src="@drawable/baseline_edit_square_30"
         app:layout_constraintBottom_toBottomOf="@+id/vContainer1"
         app:layout_constraintEnd_toEndOf="@+id/vContainer1"
-        app:layout_constraintTop_toBottomOf="@+id/vLine1" />
+        app:layout_constraintTop_toBottomOf="@+id/vLine1"
+        tools:ignore="TouchTargetSizeCheck" />
 
 
     <View
@@ -341,7 +348,7 @@
         android:layout_marginStart="16dp"
         android:alpha="0.5"
         android:elevation="2dp"
-        android:text="Repeat:"
+        android:text="@string/add_reminder_repeat"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -356,7 +363,7 @@
         android:layout_marginStart="16dp"
         android:alpha="0.5"
         android:elevation="2dp"
-        android:text="Notification:"
+        android:text="@string/add_reminder_notification"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -403,12 +410,13 @@
         android:layout_marginEnd="16dp"
         android:alpha="0.5"
         android:background="@color/empty"
-        android:clickable="false"
+        android:contentDescription="@string/add_reminder_select_repeat"
         android:elevation="2dp"
         android:src="@drawable/baseline_edit_square_30"
         app:layout_constraintBottom_toTopOf="@+id/vLine2"
         app:layout_constraintEnd_toEndOf="@+id/vContainer2"
-        app:layout_constraintTop_toTopOf="@+id/vContainer2" />
+        app:layout_constraintTop_toTopOf="@+id/vContainer2"
+        tools:ignore="TouchTargetSizeCheck" />
 
     <ImageButton
         android:id="@+id/btnEventReminderTime"
@@ -417,12 +425,13 @@
         android:layout_marginEnd="16dp"
         android:alpha="0.5"
         android:background="@color/empty"
-        android:clickable="false"
+        android:contentDescription="@string/add_reminder_select_notification"
         android:elevation="2dp"
         android:src="@drawable/baseline_edit_square_30"
         app:layout_constraintBottom_toBottomOf="@+id/vContainer2"
         app:layout_constraintEnd_toEndOf="@+id/vContainer2"
-        app:layout_constraintTop_toBottomOf="@+id/vLine2" />
+        app:layout_constraintTop_toBottomOf="@+id/vLine2"
+        tools:ignore="TouchTargetSizeCheck" />
 
     <Switch
         android:id="@+id/swIncludesTime"
@@ -430,13 +439,13 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:alpha="0.5"
-        android:clickable="false"
         android:elevation="2dp"
         android:thumb="@drawable/custom_thumb_color_switch"
         android:track="@drawable/custom_track"
         app:layout_constraintBottom_toTopOf="@+id/vLine3"
         app:layout_constraintEnd_toEndOf="@+id/vContainer1"
-        app:layout_constraintTop_toTopOf="@+id/vContainer1" />
+        app:layout_constraintTop_toTopOf="@+id/vContainer1"
+        tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
 
     <View
         android:id="@+id/vClockIcon"
