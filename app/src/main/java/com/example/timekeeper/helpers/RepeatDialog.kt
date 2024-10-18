@@ -11,17 +11,18 @@ import android.widget.SeekBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.setFragmentResult
 import com.example.timekeeper.R
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
-class RecurrenceDialog(startDate: LocalDate): DialogFragment() {
+class RepeatDialog(startDate: LocalDate): DialogFragment() {
 
     private var selectedOption: Int = R.id.checkBox1
 
-    private var endRepeatDate: LocalDate = LocalDate.now()
+    private var endRepeatDate: LocalDate? = null
 
     // Minimum selectable date for the date picker
     // Had to set it again, otherwise I have no access to the variable
@@ -30,13 +31,15 @@ class RecurrenceDialog(startDate: LocalDate): DialogFragment() {
     // Text for updating the seeker bar text (day, week, month, year)
     private var frequencyType: String = ""
 
+    private var repeatInterval: Int = 0
+
     // View for accessing the component of the repeat dialog
     private lateinit var dialogView: View
 
     @SuppressLint("DialogFragmentCallbacksDetector", "InflateParams", "SetTextI18n")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Inflate the layout of the repeat dialog
-        dialogView = layoutInflater.inflate(R.layout.recurrence_dialog, null)
+        dialogView = layoutInflater.inflate(R.layout.repeat_dialog, null)
 
         // Set the button and seek bar to disabled
         dialogView.findViewById<ImageButton>(R.id.btnRepeatEnd).isEnabled = false
@@ -45,6 +48,7 @@ class RecurrenceDialog(startDate: LocalDate): DialogFragment() {
         // Set the on click for every option
         dialogView.findViewById<ConstraintLayout>(R.id.option1).setOnClickListener {
             switchSelected(R.id.checkBox1)
+            frequencyType = ""
         }
         dialogView.findViewById<ConstraintLayout>(R.id.option2).setOnClickListener {
             switchSelected(R.id.checkBox2)
@@ -71,9 +75,13 @@ class RecurrenceDialog(startDate: LocalDate): DialogFragment() {
         dialogView.findViewById<ImageButton>(R.id.btnRepeatEnd).setOnClickListener {
             val datePickerDialog = DatePickerDialog(requireContext(), R.style.CustomDatePickerDialog, { _, selectedYear, selectedMonth, selectedDay ->
                 endRepeatDate = LocalDate.parse("$selectedDay/${selectedMonth + 1}/$selectedYear", DateTimeFormatter.ofPattern("d/M/y"))
-                dialogView.findViewById<TextView>(R.id.txtRepeatEndDate).setText(endRepeatDate.format(
-                    DateTimeFormatter.ofPattern("d. M. yyyy")))
-            }, endRepeatDate.year, endRepeatDate.monthValue-1, endRepeatDate.dayOfMonth)
+                dialogView.findViewById<TextView>(R.id.txtRepeatEndDate).text = endRepeatDate!!.format(
+                    DateTimeFormatter.ofPattern("d. M. yyyy"))
+            },
+                endRepeatDate?.year ?: LocalDate.now().year,
+                (endRepeatDate?.monthValue ?: LocalDate.now().monthValue) -1,
+                endRepeatDate?.dayOfMonth ?: LocalDate.now().dayOfMonth
+            )
 
             datePickerDialog.datePicker.firstDayOfWeek = Calendar.MONDAY
 
@@ -105,8 +113,19 @@ class RecurrenceDialog(startDate: LocalDate): DialogFragment() {
 
         return AlertDialog.Builder(requireContext(), R.style.RecurrenceDialog)
             .setView(dialogView)
-            .setPositiveButton("OK") { _, _ -> }
-            .setNegativeButton("Cancel") { _, _ -> }
+            .setPositiveButton("OK") { _, _ ->
+                val result = Bundle().apply {
+                    putString("repeatPeriod", frequencyType)
+                    putInt("interval", repeatInterval)
+                    putString("endDate", endRepeatDate?.format(
+                        DateTimeFormatter.ofPattern("d. M. yyyy"))
+                    )
+                }
+                setFragmentResult("repeatFragmentDialogRequestCode", result)
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
             .create()
     }
 
@@ -135,6 +154,7 @@ class RecurrenceDialog(startDate: LocalDate): DialogFragment() {
         val progress = dialogView.findViewById<SeekBar>(R.id.sbRepeatFrequency).progress
         val progressValue = (progress + 1).toString()
         if (progress > 0) {
+            repeatInterval = progressValue.toInt()
             dialogView.findViewById<TextView>(R.id.txtRepeatFrequency).text = "Repeat every " + progressValue + " " + frequencyType + "s"
         }
         else {

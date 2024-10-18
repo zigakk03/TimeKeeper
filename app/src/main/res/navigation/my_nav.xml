@@ -9,7 +9,7 @@
         android:id="@+id/newReminderFragment"
         android:name="com.example.timekeeper.fragments.NewReminderFragment"
         android:label="fragment_new_notification"
-        tools:layout="@layout/fragment_new_notification" >
+        tools:layout="@layout/fragment_new_reminder_event" >
         <action
             android:id="@+id/navigate_newReminder_to_home"
             app:destination="@id/homeFragment"
@@ -52,7 +52,7 @@
         android:id="@+id/editReminderFragment"
         android:name="com.example.timekeeper.fragments.EditReminderFragment"
         android:label="fragment_edit_notification"
-        tools:layout="@layout/fragment_edit_notification" >
+        tools:layout="@layout/fragment_edit_reminder" >
         <action
             android:id="@+id/navigate_editReminder_to_home"
             app:destination="@id/homeFragment"

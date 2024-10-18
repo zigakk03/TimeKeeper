@@ -9,7 +9,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,7 +25,7 @@ import com.example.timekeeper.R
 import com.example.timekeeper.adapters.NotificationAdapter
 import com.example.timekeeper.database.Reminder
 import com.example.timekeeper.database.ReminderDatabase
-import com.example.timekeeper.helpers.RecurrenceDialog
+import com.example.timekeeper.helpers.RepeatDialog
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
 import kotlinx.coroutines.launch
@@ -46,6 +45,10 @@ class NewReminderFragment : Fragment() {
     private var endDate: LocalDate = LocalDate.now()
     private var endTime: LocalTime = LocalTime.now()
 
+    private var repeatPeriod: String? = ""
+    private var interval: Int = 0
+    private var endRepeatDate: String? = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -58,7 +61,7 @@ class NewReminderFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_new_notification, container, false)
+        view = inflater.inflate(R.layout.fragment_new_reminder_event, container, false)
 
         view.findViewById<TextView>(R.id.txtStartDate).setText(startDate.format(
             DateTimeFormatter.ofPattern("d. M. yyyy")))
@@ -263,11 +266,41 @@ class NewReminderFragment : Fragment() {
             }
         }
 
+        // todo - clear repeat if end is bigger than start date
         // Sets the repeat button on click
         view.findViewById<ImageButton>(R.id.btnRepeat).setOnClickListener {
-            val recurrenceDialog = RecurrenceDialog(startDate)
+            val repeatDialog = RepeatDialog(startDate)
             // Shows the recurrence dialog
-            recurrenceDialog.show(childFragmentManager,"RecurrenceDialog")
+            repeatDialog.show(childFragmentManager,"RecurrenceDialog")
+
+            childFragmentManager.setFragmentResultListener("repeatFragmentDialogRequestCode",this) { requestKey, bundle ->
+                repeatPeriod = bundle.getString("repeatPeriod")
+                interval = bundle.getInt("interval")
+                endRepeatDate = bundle.getString("endDate")
+                if (repeatPeriod == ""){
+                    view.findViewById<TextView>(R.id.txtRepeatText).text = ""
+                }
+                else if (interval > 1) {
+                    if (endRepeatDate.equals(null)) {
+                        view.findViewById<TextView>(R.id.txtRepeatText).text =
+                            "Every " + interval + " " + repeatPeriod + "s"
+                    }
+                    else {
+                        view.findViewById<TextView>(R.id.txtRepeatText).text =
+                            "Every " + interval + " " + repeatPeriod + "s | " + endRepeatDate
+                    }
+                }
+                else {
+                    if (endRepeatDate.equals(null)) {
+                        view.findViewById<TextView>(R.id.txtRepeatText).text =
+                            "Every $repeatPeriod"
+                    }
+                    else {
+                        view.findViewById<TextView>(R.id.txtRepeatText).text =
+                            "Every $repeatPeriod | $endRepeatDate"
+                    }
+                }
+            }
         }
 
         return view

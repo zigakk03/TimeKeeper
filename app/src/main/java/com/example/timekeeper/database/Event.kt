@@ -2,9 +2,7 @@ package com.example.timekeeper.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 
 @Entity
@@ -19,14 +17,13 @@ data class Event(
     val endDate: LocalDate,
     val endTime: LocalTime?,
 
-    /*
-    val recurrenceType: RecurrenceType? = null, // DAILY, WEEKLY, MONTHLY, YEARLY
-    val recurrenceInterval: Int = 1,
-    val recurrenceEnd: LocalDateTime? = null, // Recurrence end date
-    */
+    val repeatType: RepeatType? = null, // DAILY, WEEKLY, MONTHLY, YEARLY
+    val repeatInterval: Int = 1,
+    val repeatEnd: LocalDate? = null, // Recurrence end date
+
     // Todo - notification / reminder
 )
 
-enum class RecurrenceType {
+enum class RepeatType {
     NONE, DAILY, WEEKLY, MONTHLY, YEARLY
 }

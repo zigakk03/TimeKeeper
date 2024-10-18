@@ -37,7 +37,7 @@ class EditReminderFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_edit_notification, container, false)
+        val view = inflater.inflate(R.layout.fragment_edit_reminder, container, false)
 
         // Variable of the colorButton background color
         var colorButton = ContextCompat.getColor(requireContext(), R.color.accent)
