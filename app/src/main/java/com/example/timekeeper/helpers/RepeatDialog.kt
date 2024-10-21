@@ -18,20 +18,20 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
-class RepeatDialog(startDate: LocalDate): DialogFragment() {
+class RepeatDialog(startDate: LocalDate, repeatPeriod: String, interval: Int, endRepeatDateValue: LocalDate?): DialogFragment() {
 
     private var selectedOption: Int = R.id.checkBox1
 
-    private var endRepeatDate: LocalDate? = null
+    private var endRepeatDate: LocalDate? = endRepeatDateValue
 
     // Minimum selectable date for the date picker
     // Had to set it again, otherwise I have no access to the variable
     private var minSelectableDate: LocalDate = startDate
 
     // Text for updating the seeker bar text (day, week, month, year)
-    private var frequencyType: String = ""
+    private var frequencyType: String = repeatPeriod
 
-    private var repeatInterval: Int = 0
+    private var repeatInterval: Int = interval
 
     // View for accessing the component of the repeat dialog
     private lateinit var dialogView: View
@@ -43,7 +43,24 @@ class RepeatDialog(startDate: LocalDate): DialogFragment() {
 
         // Set the button and seek bar to disabled
         dialogView.findViewById<ImageButton>(R.id.btnRepeatEnd).isEnabled = false
-        dialogView.findViewById<SeekBar>(R.id.sbRepeatFrequency).isEnabled = false
+        dialogView.findViewById<SeekBar>(R.id.sbRepeatFrequency).apply {
+            isEnabled = false
+            progress = repeatInterval-1
+        }
+        updateSekBar()
+
+        when (frequencyType) {
+            "day" -> switchSelected(R.id.checkBox2)
+            "week" -> switchSelected(R.id.checkBox3)
+            "month" -> switchSelected(R.id.checkBox4)
+            "year" -> switchSelected(R.id.checkBox5)
+            else -> switchSelected(R.id.checkBox1)
+        }
+
+        if (endRepeatDate != null){
+            dialogView.findViewById<TextView>(R.id.txtRepeatEndDate).text = endRepeatDate!!.format(
+                DateTimeFormatter.ofPattern("d. M. yyyy"))
+        }
 
         // Set the on click for every option
         dialogView.findViewById<ConstraintLayout>(R.id.option1).setOnClickListener {
@@ -87,8 +104,10 @@ class RepeatDialog(startDate: LocalDate): DialogFragment() {
 
             datePickerDialog.datePicker.minDate = minSelectableDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
+            // todo - check if there is a third button option
             datePickerDialog.setOnCancelListener {
                 dialogView.findViewById<TextView>(R.id.txtRepeatEndDate).setText("")
+                endRepeatDate = null
             }
 
             datePickerDialog.show()

@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,9 +46,9 @@ class NewReminderFragment : Fragment() {
     private var endDate: LocalDate = LocalDate.now()
     private var endTime: LocalTime = LocalTime.now()
 
-    private var repeatPeriod: String? = ""
+    private var repeatPeriod: String = ""
     private var interval: Int = 0
-    private var endRepeatDate: String? = ""
+    private var endRepeatDate: LocalDate? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -207,6 +208,12 @@ class NewReminderFragment : Fragment() {
                     view.findViewById<TextView>(R.id.txtStartDate).setText(startDate.format(
                         DateTimeFormatter.ofPattern("d. M. yyyy")))
                 }
+                if (endRepeatDate != null && startDate > endRepeatDate) {
+                    endRepeatDate = null
+                    interval = 0
+                    repeatPeriod = ""
+                    view.findViewById<TextView>(R.id.txtRepeatText).text = ""
+                }
             }, startDate.year, startDate.monthValue-1, startDate.dayOfMonth)
 
             datePickerDialog.datePicker.firstDayOfWeek = Calendar.MONDAY
@@ -266,38 +273,47 @@ class NewReminderFragment : Fragment() {
             }
         }
 
-        // todo - clear repeat if end is bigger than start date
         // Sets the repeat button on click
         view.findViewById<ImageButton>(R.id.btnRepeat).setOnClickListener {
-            val repeatDialog = RepeatDialog(startDate)
+            val repeatDialog = RepeatDialog(startDate, repeatPeriod, interval, endRepeatDate)
             // Shows the recurrence dialog
             repeatDialog.show(childFragmentManager,"RecurrenceDialog")
 
             childFragmentManager.setFragmentResultListener("repeatFragmentDialogRequestCode",this) { requestKey, bundle ->
-                repeatPeriod = bundle.getString("repeatPeriod")
+                repeatPeriod = bundle.getString("repeatPeriod") ?: ""
                 interval = bundle.getInt("interval")
-                endRepeatDate = bundle.getString("endDate")
+                val endRepeatDateText = bundle.getString("endDate")
+                if (endRepeatDateText == null) {
+                    endRepeatDate = null
+                } else {
+                    endRepeatDate = LocalDate.parse(endRepeatDateText, DateTimeFormatter.ofPattern("d. M. yyyy"))
+                }
+
+
                 if (repeatPeriod == ""){
                     view.findViewById<TextView>(R.id.txtRepeatText).text = ""
+                    repeatPeriod = ""
+                    interval = 0
+                    endRepeatDate = null
                 }
                 else if (interval > 1) {
-                    if (endRepeatDate.equals(null)) {
+                    if (endRepeatDateText.equals(null)) {
                         view.findViewById<TextView>(R.id.txtRepeatText).text =
                             "Every " + interval + " " + repeatPeriod + "s"
                     }
                     else {
                         view.findViewById<TextView>(R.id.txtRepeatText).text =
-                            "Every " + interval + " " + repeatPeriod + "s | " + endRepeatDate
+                            "Every " + interval + " " + repeatPeriod + "s | " + endRepeatDateText
                     }
                 }
                 else {
-                    if (endRepeatDate.equals(null)) {
+                    if (endRepeatDateText.equals(null)) {
                         view.findViewById<TextView>(R.id.txtRepeatText).text =
                             "Every $repeatPeriod"
                     }
                     else {
                         view.findViewById<TextView>(R.id.txtRepeatText).text =
-                            "Every $repeatPeriod | $endRepeatDate"
+                            "Every $repeatPeriod | $endRepeatDateText"
                     }
                 }
             }
