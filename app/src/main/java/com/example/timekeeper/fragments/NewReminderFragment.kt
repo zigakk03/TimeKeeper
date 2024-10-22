@@ -9,7 +9,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,8 +23,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import com.example.timekeeper.R
 import com.example.timekeeper.adapters.NotificationAdapter
+import com.example.timekeeper.database.Event
 import com.example.timekeeper.database.Reminder
 import com.example.timekeeper.database.ReminderDatabase
+import com.example.timekeeper.database.RepeatType
 import com.example.timekeeper.helpers.RepeatDialog
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
@@ -103,39 +104,71 @@ class NewReminderFragment : Fragment() {
         view.findViewById<ImageButton>(R.id.btnSave).setOnClickListener {
             // Database setup
             val db = ReminderDatabase.getDatabase(requireContext())
-            val notificationDao = db.reminderDao()
+            val reminderDao = db.reminderDao()
 
             lifecycleScope.launch {
                 // Check if iTxtTitle is empty
                 if (!view.findViewById<EditText>(R.id.iTxtTitle).text.isNullOrEmpty()) {
-                    // Values of a reminder
+                    // Values of a reminder / event
                     val titleTxt = view.findViewById<EditText>(R.id.iTxtTitle).text.toString()
                     val descriptionTxt = view.findViewById<EditText>(R.id.iTxtDescription).text.toString()
                     val notificationColor = '#'+colorButton.toHexString()
 
-                    // Inserts a new reminder and gets its id
-                    val reminderId = notificationDao.upsertReminder(
-                        Reminder(
-                        0,
-                        notificationColor,
-                        titleTxt,
-                        descriptionTxt,
-                        LocalDateTime.now(),
-                            null
+                    if (view.findViewById<Switch>(R.id.swSelection).isChecked) {
+                        val repeatType = when(repeatPeriod) {
+                            "day" -> RepeatType.DAILY
+                            "week" -> RepeatType.WEEKLY
+                            "month" -> RepeatType.MONTHLY
+                            "year" -> RepeatType.YEARLY
+                            else -> RepeatType.NONE
+                        }
+
+                        // Todo - fix inserting time when time switch is off
+                        reminderDao.upsertEvent(
+                            Event(
+                                0,
+                                notificationColor,
+                                titleTxt,
+                                descriptionTxt,
+                                startDate,
+                                startTime,
+                                endDate,
+                                endTime,
+                                repeatType,
+                                interval,
+                                endRepeatDate
+                            )
                         )
-                    )
 
-                    // Shows a new notification referring to the previously created reminder
-                    NotificationAdapter.createAndShowNotification(
-                        requireContext(),
-                        notificationColor,
-                        titleTxt,
-                        descriptionTxt,
-                        reminderId.toInt()
-                    )
+                        // Navigates to the calender page
+                        Navigation.findNavController(view).navigate(R.id.navigate_newReminder_to_calendar)
+                    }
+                    else {
+                        // Reminder
+                        // Inserts a new reminder and gets its id
+                        val reminderId = reminderDao.upsertReminder(
+                            Reminder(
+                                0,
+                                notificationColor,
+                                titleTxt,
+                                descriptionTxt,
+                                LocalDateTime.now(),
+                                null
+                            )
+                        )
 
-                    // Navigates back to the home page
-                    Navigation.findNavController(view).navigate(R.id.navigate_newReminder_to_home)
+                        // Shows a new notification referring to the previously created reminder
+                        NotificationAdapter.createAndShowNotification(
+                            requireContext(),
+                            notificationColor,
+                            titleTxt,
+                            descriptionTxt,
+                            reminderId.toInt()
+                        )
+
+                        // Navigates back to the home page
+                        Navigation.findNavController(view).navigate(R.id.navigate_newReminder_to_home)
+                    }
                 }
                 else {
                     // Find the iTxtTitle view

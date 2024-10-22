@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Dao
@@ -24,4 +25,11 @@ interface ReminderDao {
     // Gets a reminder with the given id
     @Query("SELECT * FROM reminder WHERE id=:id")
     suspend fun getReminder(id: Int): Reminder
+
+    @Upsert
+    suspend fun upsertEvent(event: Event)
+
+    @Query("SELECT * FROM event WHERE startDate = :selectedDate")
+    suspend fun getEventsOnSelectedDate(selectedDate: LocalDate? = LocalDate.now()): MutableList<Event>
+    // Todo - get all relevant events (repeating events included)
 }
