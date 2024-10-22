@@ -64,10 +64,12 @@ class NewReminderFragment : Fragment() {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_new_reminder_event, container, false)
 
+        // Sets the start and end dates to today's date
         view.findViewById<TextView>(R.id.txtStartDate).setText(startDate.format(
             DateTimeFormatter.ofPattern("d. M. yyyy")))
         view.findViewById<TextView>(R.id.txtEndDate).setText(endDate.format(
             DateTimeFormatter.ofPattern("d. M. yyyy")))
+
         // Disables the buttons
         switchSelection(false)
 
@@ -77,21 +79,21 @@ class NewReminderFragment : Fragment() {
         view.findViewById<ImageButton>(R.id.btnColorPicker).setOnClickListener {
             // Open ColorPickerDialogBuilder
             ColorPickerDialogBuilder
-                .with(context)
-                .setTitle("Choose color")
+                .with(context, R.style.ColorPickerDialog)
+                .setTitle("Choose Color")
                 .initialColor(colorButton)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(8)
                 .lightnessSliderOnly()
                 // Sets the background color of the colorButton
                 .setPositiveButton(
-                    "ok"
+                    "OK"
                 ) { dialog, selectedColor, allColors ->
                     colorButton = selectedColor
                     view.findViewById<ImageButton>(R.id.btnColorPicker).setBackgroundColor(selectedColor)
                 }
                 .setNegativeButton(
-                    "cancel"
+                    "CANCEL"
                 ) { dialog, which -> }
                 .build()
                 .show()

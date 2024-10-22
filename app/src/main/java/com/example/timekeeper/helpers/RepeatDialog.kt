@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
@@ -104,10 +105,11 @@ class RepeatDialog(startDate: LocalDate, repeatPeriod: String, interval: Int, en
 
             datePickerDialog.datePicker.minDate = minSelectableDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
-            // todo - check if there is a third button option
-            datePickerDialog.setOnCancelListener {
-                dialogView.findViewById<TextView>(R.id.txtRepeatEndDate).setText("")
+            datePickerDialog.setButton(DialogInterface.BUTTON_NEUTRAL, "Clear") { dialog, _ ->
+                // Set a variable to null
+                dialogView.findViewById<TextView>(R.id.txtRepeatEndDate).text = ""
                 endRepeatDate = null
+                dialog.dismiss()
             }
 
             datePickerDialog.show()
