@@ -123,22 +123,40 @@ class NewReminderFragment : Fragment() {
                             else -> RepeatType.NONE
                         }
 
-                        // Todo - fix inserting time when time switch is off
-                        reminderDao.upsertEvent(
-                            Event(
-                                0,
-                                notificationColor,
-                                titleTxt,
-                                descriptionTxt,
-                                startDate,
-                                startTime,
-                                endDate,
-                                endTime,
-                                repeatType,
-                                interval,
-                                endRepeatDate
+                        if (view.findViewById<Switch>(R.id.swIncludesTime).isChecked) {
+                            reminderDao.upsertEvent(
+                                Event(
+                                    0,
+                                    notificationColor,
+                                    titleTxt,
+                                    descriptionTxt,
+                                    startDate,
+                                    startTime,
+                                    endDate,
+                                    endTime,
+                                    repeatType,
+                                    interval,
+                                    endRepeatDate
+                                )
                             )
-                        )
+                        }
+                        else {
+                            reminderDao.upsertEvent(
+                                Event(
+                                    0,
+                                    notificationColor,
+                                    titleTxt,
+                                    descriptionTxt,
+                                    startDate,
+                                    null,
+                                    endDate,
+                                    null,
+                                    repeatType,
+                                    interval,
+                                    endRepeatDate
+                                )
+                            )
+                        }
 
                         // Navigates to the calender page
                         Navigation.findNavController(view).navigate(R.id.navigate_newReminder_to_calendar)

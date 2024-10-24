@@ -9,14 +9,24 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timekeeper.R
 import com.example.timekeeper.adapters.CalendarAdapter
+import com.example.timekeeper.adapters.EventAdapter
+import com.example.timekeeper.database.Event
+import com.example.timekeeper.database.ReminderDatabase
+import com.example.timekeeper.database.RepeatType
 import com.example.timekeeper.helpers.CalendarCell
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 class CalendarFragment : Fragment() {
 
@@ -97,8 +107,14 @@ class CalendarFragment : Fragment() {
         }
         calendarRecyclerView.addOnItemTouchListener(itemTouchListener)
 
+        view.findViewById<FloatingActionButton>(R.id.fBtnAddEvent).setOnClickListener { Navigation.findNavController(view).navigate(
+            R.id.navigate_calendar_to_newReminder
+        ) }
+
         // Updates the calendar
         updateCalendar()
+
+        updateViewableEvents()
 
         return view
     }
@@ -247,6 +263,46 @@ class CalendarFragment : Fragment() {
                 dateFormat
             )
             customCalendarAdapter.updateSelectedPosition(position)
+            updateViewableEvents()
         }
+    }
+
+    private fun updateViewableEvents() {
+        lifecycleScope.launch {
+            // Database setup
+            val db = ReminderDatabase.getDatabase(requireContext())
+            val notifDao = db.reminderDao()
+            val relevantEvents = notifDao.getEventsRelevantToSelectedDate(selectedDay)
+            val filterdEvents = filterEvents(relevantEvents)
+
+            // Notification RecyclerView setup
+            val notificationRecyclerView: RecyclerView = layoutView.findViewById(R.id.rvEvents)
+            notificationRecyclerView.layoutManager = LinearLayoutManager(context)
+            val customReminderAdapter = EventAdapter(filterdEvents, requireContext(), lifecycleScope)
+            notificationRecyclerView.adapter = customReminderAdapter
+        }
+    }
+
+    private fun filterEvents(events: MutableList<Event>): MutableList<Event>{
+        return events.filter { event ->
+            // Calculate the difference between startDate and selectedDate based on the recurrence type
+            val daysBetween = ChronoUnit.DAYS.between(event.startDate, selectedDay)
+            val weeksBetween = ChronoUnit.WEEKS.between(event.startDate, selectedDay)
+            val monthsBetween = ChronoUnit.MONTHS.between(event.startDate, selectedDay)
+            val yearsBetween = ChronoUnit.YEARS.between(event.startDate, selectedDay)
+
+            // Determine if the event should occur on the selected date based on its recurrence type and interval
+            when (event.repeatType) {
+                RepeatType.DAILY -> isDivisibleBy(daysBetween, event.repeatInterval)
+                RepeatType.WEEKLY -> isDivisibleBy(weeksBetween, event.repeatInterval)
+                RepeatType.MONTHLY -> isDivisibleBy(monthsBetween, event.repeatInterval)
+                RepeatType.YEARLY -> isDivisibleBy(yearsBetween, event.repeatInterval)
+                else -> event.startDate == selectedDay  // Non-recurring event
+            }
+        }.toMutableList()
+    }
+
+    private fun isDivisibleBy(value: Long, interval: Int): Boolean {
+        return value >= 0 && value % interval == 0.toLong()  // Check if value is divisible by the interval
     }
 }

@@ -79,5 +79,14 @@
         android:id="@+id/calendarFragment"
         android:name="com.example.timekeeper.fragments.CalendarFragment"
         android:label="fragment_calendar"
-        tools:layout="@layout/fragment_calendar" />
+        tools:layout="@layout/fragment_calendar" >
+        <action
+            android:id="@+id/navigate_calendar_to_newReminder"
+            app:destination="@id/newReminderFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/fade_out"
+            app:popUpTo="@id/calendarFragment" />
+    </fragment>
 </navigation>
