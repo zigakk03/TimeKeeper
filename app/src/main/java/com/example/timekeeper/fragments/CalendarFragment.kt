@@ -2,6 +2,7 @@ package com.example.timekeeper.fragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -21,8 +22,12 @@ import com.example.timekeeper.database.Event
 import com.example.timekeeper.database.ReminderDatabase
 import com.example.timekeeper.database.RepeatType
 import com.example.timekeeper.helpers.CalendarCell
+import com.example.timekeeper.helpers.EventDataTransfer
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -107,114 +112,184 @@ class CalendarFragment : Fragment() {
         }
         calendarRecyclerView.addOnItemTouchListener(itemTouchListener)
 
-        view.findViewById<FloatingActionButton>(R.id.fBtnAddEvent).setOnClickListener { Navigation.findNavController(view).navigate(
-            R.id.navigate_calendar_to_newReminder
-        ) }
-
-        // Updates the calendar
-        updateCalendar()
-
-        updateViewableEvents()
+        view.findViewById<FloatingActionButton>(R.id.fBtnAddEvent).setOnClickListener {
+            Navigation.findNavController(view).navigate(
+                R.id.navigate_calendar_to_newReminder
+            )
+        }
 
         return view
     }
 
-    fun updateCalendar() {
-        // First changes the text of the year and month
-        layoutView.findViewById<TextView>(R.id.txtYear).text =
-            selectedMonth.format(DateTimeFormatter.ofPattern("YYYY"))
-        layoutView.findViewById<TextView>(R.id.txtMonth).text =
-            selectedMonth.format(DateTimeFormatter.ofPattern("MMMM"))
+    override fun onStart() {
+        super.onStart()
+        // Updates the calendar
+        updateCalendar()
 
-        // Initialization of the list of all the dates
-        val days: MutableList<CalendarCell> = mutableListOf()
+        Thread {
+            updateViewableEvents()
+        }.start()
+    }
 
-        // Checks if the first day in the selected month is not a monday.
-        // If it isn't it ads the previous months days from the last day to the last monday to days list
-        if (LocalDate.parse(
-                selectedMonth.year.toString() + "-" + selectedMonth.month.value + "-1",
-                dateFormat
-            ).dayOfWeek != DayOfWeek.MONDAY
-        ) {
-            // Previous month max days
-            var maxDaysOfMonth = LocalDate.parse(
-                selectedMonth.minusMonths(1).year.toString() + "-" + selectedMonth.minusMonths(1).month.value + "-1",
-                dateFormat
-            ).month.length(selectedMonth.isLeapYear) + 1
-            // Ads the previous months days from the last day to the last monday to days list
-            do {
-                maxDaysOfMonth--
+    private fun updateCalendar() {
+        // todo - lazy load
+
+        CoroutineScope(Dispatchers.Default).launch {
+
+            // Initialization of the list of all the dates
+            val days: MutableList<CalendarCell> = mutableListOf()
+            var minDate: LocalDate
+
+            // Checks if the first day in the selected month is not a monday.
+            // If it isn't it ads the previous months days from the last day to the last monday to days list
+            if (LocalDate.parse(
+                    selectedMonth.year.toString() + "-" + selectedMonth.month.value + "-1",
+                    dateFormat
+                ).dayOfWeek != DayOfWeek.MONDAY
+            ) {
+
+                // Previous month max days
+                val maxDaysOfMonth = LocalDate.parse(
+                    selectedMonth.minusMonths(1).year.toString() + "-" + selectedMonth.minusMonths(1).month.value + "-1",
+                    dateFormat
+                ).month.length(selectedMonth.isLeapYear) + 1
+
+                var date = LocalDate.parse(
+                    selectedMonth.minusMonths(1).year.toString() + "-" + selectedMonth.minusMonths(1).month.value + "-" + (maxDaysOfMonth - 1),
+                    dateFormat
+                )
+
+                // Ads the previous months days from the last day to the last monday to days list
+                while (date.dayOfWeek != DayOfWeek.MONDAY) {
+                    days.add(
+                        CalendarCell(
+                            date.dayOfMonth.toString(),
+                            mutableListOf(),
+                            false,
+                            false,
+                            false,
+                            false
+                        )
+                    )
+
+                    date = date.minusDays(1)
+                }
+
                 days.add(
                     CalendarCell(
-                        maxDaysOfMonth.toString(),
+                        (date.dayOfMonth - 1).toString(),
+                        mutableListOf(),
                         false,
                         false,
                         false,
                         false
                     )
                 )
-            } while (LocalDate.parse(
-                    selectedMonth.minusMonths(1).year.toString() + "-" + selectedMonth.minusMonths(1).month.value + "-" + maxDaysOfMonth,
+
+                minDate = date.minusDays(1)
+
+                // Since the days ben added in reverse order reverses the order
+                days.reverse()
+            } else {
+                minDate = LocalDate.parse(
+                    selectedMonth.year.toString() + "-" + selectedMonth.month.value + "-1",
                     dateFormat
-                ).dayOfWeek != DayOfWeek.MONDAY
-            )
-            // Since the days ben added in reverse order reverses the order
-            days.reverse()
-        }
-
-        // Adds all the days of the selected month to the list
-        val maxDaysOfMonth = LocalDate.parse(
-            selectedMonth.year.toString() + "-" + selectedMonth.month.value + "-1",
-            dateFormat
-        ).month.length(selectedMonth.isLeapYear)
-        for (day in 1..maxDaysOfMonth) {
-            days.add(
-                CalendarCell(
-                    day.toString(),
-                    (LocalDate.parse(
-                        selectedMonth.year.toString() + "-" + selectedMonth.month.value + "-" + day,
-                        dateFormat
-                    ).isEqual(today)),
-                    (LocalDate.parse(
-                        selectedMonth.year.toString() + "-" + selectedMonth.month.value + "-" + day,
-                        dateFormat
-                    ).dayOfWeek == DayOfWeek.SUNDAY),
-                    true,
-                    (LocalDate.parse(
-                        selectedMonth.year.toString() + "-" + selectedMonth.month.value + "-" + day,
-                        dateFormat
-                    ).isEqual(selectedDay))
                 )
-            )
-        }
+            }
 
-        // Adds the next month days to the list until the list reaches the size of 42 elements
-        var counter = 1
-        for (day in days.size..41) {
-            days.add(
-                CalendarCell(
-                    counter.toString(),
-                    false,
-                    false,
-                    false,
-                    false
+            var activeMonthDay = LocalDate.parse(
+                selectedMonth.year.toString() + "-" + selectedMonth.month.value + "-1",
+                dateFormat
+            )
+
+            // Adds all the days of the selected month to the list
+            val maxDaysOfMonth = activeMonthDay.month.length(selectedMonth.isLeapYear)
+            for (day in 1..maxDaysOfMonth) {
+
+                days.add(
+                    CalendarCell(
+                        day.toString(),
+                        mutableListOf(),
+                        (activeMonthDay.isEqual(today)),
+                        (activeMonthDay.dayOfWeek == DayOfWeek.SUNDAY),
+                        true,
+                        (activeMonthDay.isEqual(selectedDay))
+                    )
                 )
-            )
-            counter++
-        }
 
-        // Finds the RecyclerView and populates it with data
-        val calendarRecyclerView: RecyclerView = layoutView.findViewById(R.id.rvCalendar)
-        customCalendarAdapter = CalendarAdapter(days, requireContext())
-        calendarRecyclerView.adapter = customCalendarAdapter
+                activeMonthDay = activeMonthDay.plusDays(1)
+            }
+
+            // Adds the next month days to the list until the list reaches the size of 42 elements
+            var counter = 1
+            for (day in days.size..41) {
+                days.add(
+                    CalendarCell(
+                        counter.toString(),
+                        mutableListOf(),
+                        false,
+                        false,
+                        false,
+                        false
+                    )
+                )
+                counter++
+            }
+
+            withContext(Dispatchers.Main) {
+                // Update UI components here if necessary
+                // Changes the text of the year and month
+                layoutView.findViewById<TextView>(R.id.txtYear).text =
+                    selectedMonth.format(DateTimeFormatter.ofPattern("YYYY"))
+                layoutView.findViewById<TextView>(R.id.txtMonth).text =
+                    selectedMonth.format(DateTimeFormatter.ofPattern("MMMM"))
+
+                // Finds the RecyclerView and populates it with data
+                val calendarRecyclerView: RecyclerView = layoutView.findViewById(R.id.rvCalendar)
+                customCalendarAdapter = CalendarAdapter(days, requireContext())
+                calendarRecyclerView.adapter = customCalendarAdapter
+            }
+
+            /*
+            todo - fix!
+            lifecycleScope.launch {
+                // Database setup
+                val db = ReminderDatabase.getDatabase(requireContext())
+                val dao = db.reminderDao()
+
+                val eventsTransfer = List(42) { mutableListOf<EventDataTransfer>() }
+
+                for (i in 0..<eventsTransfer.size) {
+                    val relevantEvents = dao.getEventsRelevantToSelectedDate(minDate)
+                    val filteredEvents = filterEvents(relevantEvents)
+
+                    for (event in filteredEvents.take(3)) {
+                        eventsTransfer[i].add(
+                            EventDataTransfer(
+                                event.title,
+                                event.color
+                            )
+                        )
+                    }
+
+                    minDate = minDate.plusDays(1)
+                }
+
+                Log.i("---here---", "eventsTransfer: $eventsTransfer")
+
+                customCalendarAdapter.updateEvents(eventsTransfer)
+            }
+
+             */
+        }
     }
 
 
     // SwipeGestureListener for swipe functionality
     private inner class SwipeGestureListener : GestureDetector.SimpleOnGestureListener() {
 
-        private val SWIPE_THRESHOLD = 100
-        private val SWIPE_VELOCITY_THRESHOLD = 100
+        private val swipeThreshold = 100
+        private val swipeVelocityThreshold = 100
 
         override fun onFling(
             e1: MotionEvent?,
@@ -229,7 +304,7 @@ class CalendarFragment : Fragment() {
 
             if (Math.abs(diffX) > Math.abs(diffY)) {
                 // Swipe left or right
-                if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                if (Math.abs(diffX) > swipeThreshold && Math.abs(velocityX) > swipeVelocityThreshold) {
                     if (diffX > 0) {
                         onSwipeRight()  // Swiped right go to previous month
                     } else {
@@ -257,7 +332,7 @@ class CalendarFragment : Fragment() {
     // Updates witch day is selected
     private fun onTap(position: Int) {
         val item = customCalendarAdapter.getItem(position)
-        if (item.isActive){
+        if (item.isActive) {
             selectedDay = LocalDate.parse(
                 selectedMonth.year.toString() + "-" + selectedMonth.month.value + "-" + item.dayString,
                 dateFormat
@@ -268,41 +343,47 @@ class CalendarFragment : Fragment() {
     }
 
     private fun updateViewableEvents() {
-        lifecycleScope.launch {
-            // Database setup
-            val db = ReminderDatabase.getDatabase(requireContext())
-            val notifDao = db.reminderDao()
-            val relevantEvents = notifDao.getEventsRelevantToSelectedDate(selectedDay)
-            val filterdEvents = filterEvents(relevantEvents)
+        Thread {
+            lifecycleScope.launch {
+                // Database setup
+                val db = ReminderDatabase.getDatabase(requireContext())
+                val dao = db.reminderDao()
+                val relevantEvents = dao.getEventsRelevantToSelectedDate(selectedDay)
+                val filterdEvents = filterEvents(relevantEvents)
 
-            // Notification RecyclerView setup
-            val notificationRecyclerView: RecyclerView = layoutView.findViewById(R.id.rvEvents)
-            notificationRecyclerView.layoutManager = LinearLayoutManager(context)
-            val customReminderAdapter = EventAdapter(filterdEvents, requireContext(), lifecycleScope)
-            notificationRecyclerView.adapter = customReminderAdapter
-        }
+                // Notification RecyclerView setup
+                val notificationRecyclerView: RecyclerView = layoutView.findViewById(R.id.rvEvents)
+                notificationRecyclerView.layoutManager = LinearLayoutManager(context)
+                val customReminderAdapter =
+                    EventAdapter(filterdEvents, requireContext(), lifecycleScope)
+                notificationRecyclerView.adapter = customReminderAdapter
+            }
+        }.start()
     }
 
-    private fun filterEvents(events: MutableList<Event>): MutableList<Event>{
+    private fun filterEvents(events: MutableList<Event>): MutableList<Event> {
         return events.filter { event ->
             // Calculate the difference between startDate and selectedDate based on the recurrence type
-            val daysBetween = ChronoUnit.DAYS.between(event.startDate, selectedDay)
-            val weeksBetween = ChronoUnit.WEEKS.between(event.startDate, selectedDay)
-            val monthsBetween = ChronoUnit.MONTHS.between(event.startDate, selectedDay)
-            val yearsBetween = ChronoUnit.YEARS.between(event.startDate, selectedDay)
+            val hoursBetween =
+                ChronoUnit.HOURS.between(event.startDate.atStartOfDay(), selectedDay.atStartOfDay())
+                    .toDouble()
+            val daysBetween = hoursBetween / 24
+            val weeksBetween = daysBetween / 7
+            val monthsBetween = daysBetween / 30.44  // average month length
+            val yearsBetween = daysBetween / 365.25  // average year length
 
             // Determine if the event should occur on the selected date based on its recurrence type and interval
             when (event.repeatType) {
-                RepeatType.DAILY -> isDivisibleBy(daysBetween, event.repeatInterval)
-                RepeatType.WEEKLY -> isDivisibleBy(weeksBetween, event.repeatInterval)
-                RepeatType.MONTHLY -> isDivisibleBy(monthsBetween, event.repeatInterval)
-                RepeatType.YEARLY -> isDivisibleBy(yearsBetween, event.repeatInterval)
+                RepeatType.DAILY -> validRepeat(daysBetween, event.repeatInterval)
+                RepeatType.WEEKLY -> validRepeat(weeksBetween, event.repeatInterval)
+                RepeatType.MONTHLY -> validRepeat(monthsBetween, event.repeatInterval)
+                RepeatType.YEARLY -> validRepeat(yearsBetween, event.repeatInterval)
                 else -> event.startDate == selectedDay  // Non-recurring event
             }
         }.toMutableList()
     }
 
-    private fun isDivisibleBy(value: Long, interval: Int): Boolean {
-        return value >= 0 && value % interval == 0.toLong()  // Check if value is divisible by the interval
+    private fun validRepeat(value: Double, interval: Int): Boolean {
+        return value >= 0 && value % interval == 0.0  // Check if value is divisible by the interval
     }
 }

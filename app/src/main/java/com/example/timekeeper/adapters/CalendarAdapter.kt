@@ -1,6 +1,8 @@
 package com.example.timekeeper.adapters
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.icu.text.Transliterator.Position
 import android.util.LayoutDirection
 import android.view.LayoutInflater
@@ -12,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timekeeper.R
 import com.example.timekeeper.helpers.CalendarCell
+import com.example.timekeeper.helpers.EventDataTransfer
 
 class CalendarAdapter(
     private val daysOfMonth: MutableList<CalendarCell>,
@@ -62,6 +65,23 @@ class CalendarAdapter(
                 ContextCompat.getColor(appContext, R.color.gray)
             )
         }
+
+
+        var counter = 1
+        for (item in curDay.events){
+            val txtId = holder.itemView.context.resources.getIdentifier("txtEvent$counter", "id", holder.itemView.context.packageName)
+            val viewId = holder.itemView.context.resources.getIdentifier("vEvent$counter", "id", holder.itemView.context.packageName)
+            holder.itemView.findViewById<TextView>(txtId).apply {
+                alpha = 1F
+                text = item.title
+            }
+            holder.itemView.findViewById<View>(viewId).apply {
+                alpha = 1F
+                backgroundTintList = ColorStateList.valueOf(Color.parseColor(item.color))
+            }
+
+            counter++
+        }
     }
 
     override fun getItemCount(): Int {
@@ -79,5 +99,12 @@ class CalendarAdapter(
         selectedItemPosition = newPosition
         daysOfMonth[selectedItemPosition].isSelected = true
         notifyItemChanged(selectedItemPosition, daysOfMonth[selectedItemPosition])
+    }
+
+    fun updateEvents(events: List<MutableList<EventDataTransfer>>){
+        for (i in 0..41){
+            daysOfMonth[i].events = events[i]
+            notifyItemChanged(i)
+        }
     }
 }
