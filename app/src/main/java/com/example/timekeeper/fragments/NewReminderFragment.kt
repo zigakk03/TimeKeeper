@@ -48,7 +48,7 @@ class NewReminderFragment : Fragment() {
     private var endTime: LocalTime = LocalTime.now()
 
     private var repeatPeriod: String = ""
-    private var interval: Int = 0
+    private var interval: Int = 1
     private var endRepeatDate: LocalDate? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

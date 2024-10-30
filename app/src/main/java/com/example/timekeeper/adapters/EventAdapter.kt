@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.timekeeper.R
 import com.example.timekeeper.database.Event
 import com.example.timekeeper.database.ReminderDatabase
+import com.example.timekeeper.fragments.CalendarFragment
 import com.example.timekeeper.fragments.HomeFragmentDirections
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
@@ -22,7 +23,8 @@ import java.time.format.DateTimeFormatter
 class EventAdapter(
     private val eventDataLists: MutableList<Event>,
     private val appContext: Context,
-    private val lifecycleScope: LifecycleCoroutineScope
+    private val lifecycleScope: LifecycleCoroutineScope,
+    private val calendarFragment: CalendarFragment
 ): RecyclerView.Adapter<EventAdapter.ReminderViewHolder>() {
 
     class ReminderViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
@@ -75,6 +77,7 @@ class EventAdapter(
                 // Notify the reminder removal
                 notifyItemRemoved(position)
                 notifyItemRangeChanged(position, itemCount)
+                calendarFragment.updateCalendar()
             }
         }
 

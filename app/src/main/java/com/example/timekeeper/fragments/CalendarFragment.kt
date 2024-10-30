@@ -35,6 +35,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import kotlin.math.roundToLong
 
 class CalendarFragment : Fragment() {
 
@@ -142,7 +143,7 @@ class CalendarFragment : Fragment() {
     // ---------- calender logic and population ----------
 
 
-    private fun updateCalendar() {
+    fun updateCalendar() {
         // Update UI components immediately with the basics
         updateMonthYearText()
 
@@ -405,7 +406,7 @@ class CalendarFragment : Fragment() {
                 val notificationRecyclerView: RecyclerView = layoutView.findViewById(R.id.rvEvents)
                 notificationRecyclerView.layoutManager = LinearLayoutManager(context)
                 val customReminderAdapter =
-                    EventAdapter(filterdEvents, requireContext(), lifecycleScope)
+                    EventAdapter(filterdEvents, requireContext(), lifecycleScope, this@CalendarFragment)
                 notificationRecyclerView.adapter = customReminderAdapter
             }
         }.start()
@@ -417,22 +418,22 @@ class CalendarFragment : Fragment() {
             val daysBetween = ChronoUnit.DAYS.between(event.startDate.atStartOfDay(), day.atStartOfDay())
                 .toDouble()
             val weeksBetween = daysBetween / 7
-            val monthsBetween = daysBetween / 30.44  // average month length
-            val yearsBetween = daysBetween / 365.25  // average year length
+            val monthsBetween = ChronoUnit.MONTHS.between(event.startDate.atStartOfDay(), day.atStartOfDay()).toDouble()
+            val yearsBetween = ChronoUnit.YEARS.between(event.startDate.atStartOfDay(), day.atStartOfDay()).toDouble()
+
 
             // Determine if the event should occur on the selected date based on its recurrence type and interval
             when (event.repeatType) {
                 RepeatType.DAILY -> validRepeat(daysBetween, event.repeatInterval)
                 RepeatType.WEEKLY -> validRepeat(weeksBetween, event.repeatInterval)
-                RepeatType.MONTHLY -> validRepeat(monthsBetween, event.repeatInterval)
-                RepeatType.YEARLY -> validRepeat(yearsBetween, event.repeatInterval)
+                RepeatType.MONTHLY -> event.startDate.dayOfMonth == day.dayOfMonth && monthsBetween % event.repeatInterval == 0.0
+                RepeatType.YEARLY -> event.startDate.dayOfMonth == day.dayOfMonth && event.startDate.month == day.month && yearsBetween % event.repeatInterval == 0.0
                 else -> event.startDate == day  // Non-recurring event
             }
         }.toMutableList()
     }
 
     private fun validRepeat(value: Double, interval: Int): Boolean {
-        // Todo - fix weekly, monthly, yearly
         return value >= 0 && value % interval == 0.0  // Check if value is divisible by the interval
     }
 }
