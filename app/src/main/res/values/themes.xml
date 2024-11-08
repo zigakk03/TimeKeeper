@@ -78,4 +78,6 @@
         <item name="android:textColor">@color/accent</item>
         <item name="backgroundTint">@color/empty</item>
     </style>
+    
+    <style name="CustomProgressBar" parent="android:Widget.Holo.ProgressBar" />
 </resources>

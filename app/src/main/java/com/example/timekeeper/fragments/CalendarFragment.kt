@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -18,6 +19,7 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.Visibility
 import com.example.timekeeper.R
 import com.example.timekeeper.adapters.CalendarAdapter
 import com.example.timekeeper.adapters.EventAdapter
@@ -35,6 +37,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import kotlin.concurrent.thread
 import kotlin.math.roundToLong
 
 class CalendarFragment : Fragment() {
@@ -92,6 +95,9 @@ class CalendarFragment : Fragment() {
             swipeGestureDetector.onTouchEvent(event)
             false
         }
+        val emptyDays: MutableList<CalendarCell> = mutableListOf()
+        customCalendarAdapter = CalendarAdapter(emptyDays, requireContext())
+        calendarRecyclerView.adapter = customCalendarAdapter
 
         // On touch listener to select a date
         val itemTouchListener = object : RecyclerView.OnItemTouchListener {
@@ -146,13 +152,16 @@ class CalendarFragment : Fragment() {
     fun updateCalendar() {
         // Update UI components immediately with the basics
         updateMonthYearText()
-
+        curtainControl(true)
         CoroutineScope(Dispatchers.Main).launch {
-            val days =
-                withContext(Dispatchers.Default) { loadCalendarCells() } // Load calendar cells in the background
-            setupCalendarAdapter(days) // Populate RecyclerView after days are loaded
+            val days = loadCalendarCells() // Load calendar cells in the background
+
             loadEvents(days)
+
         }
+        Handler(Looper.getMainLooper()).postDelayed({
+            curtainControl(false)
+        }, 500)
     }
 
     private fun updateMonthYearText() {
@@ -226,7 +235,6 @@ class CalendarFragment : Fragment() {
                 )
             }
 
-
             // Since the days ben added in reverse order reverses the order
             days.reverse()
         }
@@ -237,16 +245,15 @@ class CalendarFragment : Fragment() {
         )
 
         // Adds all the days of the selected month to the list
-        val maxDaysOfMonth = activeMonthDay.month.length(selectedMonth.isLeapYear)
-        for (day in 1..maxDaysOfMonth) {
+        for (day in days.size..41) {
 
             days.add(
                 CalendarCell(
-                    day.toString(),
+                    activeMonthDay.dayOfMonth.toString(),
                     mutableListOf(),
                     (activeMonthDay.isEqual(today)),
                     (activeMonthDay.dayOfWeek == DayOfWeek.SUNDAY),
-                    true,
+                    (activeMonthDay.month.value == selectedMonth.month.value),
                     (activeMonthDay.isEqual(selectedDay))
                 )
             )
@@ -254,21 +261,7 @@ class CalendarFragment : Fragment() {
             activeMonthDay = activeMonthDay.plusDays(1)
         }
 
-        // Adds the next month days to the list until the list reaches the size of 42 elements
-        var counter = 1
-        for (day in days.size..41) {
-            days.add(
-                CalendarCell(
-                    counter.toString(),
-                    mutableListOf(),
-                    false,
-                    false,
-                    false,
-                    false
-                )
-            )
-            counter++
-        }
+        customCalendarAdapter.updateCalender(days)
 
         return days
     }
@@ -311,13 +304,6 @@ class CalendarFragment : Fragment() {
 
         customCalendarAdapter.updateEvents(eventsTransfer)
 
-    }
-
-    private fun setupCalendarAdapter(days: MutableList<CalendarCell>) {
-        // Finds the RecyclerView and populates it with data
-        val calendarRecyclerView: RecyclerView = layoutView.findViewById(R.id.rvCalendar)
-        customCalendarAdapter = CalendarAdapter(days, requireContext())
-        calendarRecyclerView.adapter = customCalendarAdapter
     }
 
 
@@ -394,32 +380,40 @@ class CalendarFragment : Fragment() {
 
 
     private fun updateViewableEvents() {
-        Thread {
-            lifecycleScope.launch {
-                // Database setup
-                val db = ReminderDatabase.getDatabase(requireContext())
-                val dao = db.reminderDao()
-                val relevantEvents = dao.getEventsRelevantToSelectedDate(selectedDay)
-                val filterdEvents = filterEvents(relevantEvents, selectedDay)
+        lifecycleScope.launch {
+            // Database setup
+            val db = ReminderDatabase.getDatabase(requireContext())
+            val dao = db.reminderDao()
+            val relevantEvents = dao.getEventsRelevantToSelectedDate(selectedDay)
+            val filterdEvents = filterEvents(relevantEvents, selectedDay)
 
-                // Notification RecyclerView setup
-                val notificationRecyclerView: RecyclerView = layoutView.findViewById(R.id.rvEvents)
-                notificationRecyclerView.layoutManager = LinearLayoutManager(context)
-                val customReminderAdapter =
-                    EventAdapter(filterdEvents, requireContext(), lifecycleScope, this@CalendarFragment)
-                notificationRecyclerView.adapter = customReminderAdapter
-            }
-        }.start()
+            // Notification RecyclerView setup
+            val notificationRecyclerView: RecyclerView = layoutView.findViewById(R.id.rvEvents)
+            notificationRecyclerView.layoutManager = LinearLayoutManager(context)
+            val customReminderAdapter =
+                EventAdapter(
+                    filterdEvents,
+                    requireContext(),
+                    lifecycleScope,
+                    this@CalendarFragment
+                )
+            notificationRecyclerView.adapter = customReminderAdapter
+        }
     }
 
     private fun filterEvents(events: MutableList<Event>, day: LocalDate): MutableList<Event> {
         return events.filter { event ->
             // Calculate the difference between startDate and selectedDate based on the recurrence type
-            val daysBetween = ChronoUnit.DAYS.between(event.startDate.atStartOfDay(), day.atStartOfDay())
-                .toDouble()
+            val daysBetween =
+                ChronoUnit.DAYS.between(event.startDate.atStartOfDay(), day.atStartOfDay())
+                    .toDouble()
             val weeksBetween = daysBetween / 7
-            val monthsBetween = ChronoUnit.MONTHS.between(event.startDate.atStartOfDay(), day.atStartOfDay()).toDouble()
-            val yearsBetween = ChronoUnit.YEARS.between(event.startDate.atStartOfDay(), day.atStartOfDay()).toDouble()
+            val monthsBetween =
+                ChronoUnit.MONTHS.between(event.startDate.atStartOfDay(), day.atStartOfDay())
+                    .toDouble()
+            val yearsBetween =
+                ChronoUnit.YEARS.between(event.startDate.atStartOfDay(), day.atStartOfDay())
+                    .toDouble()
 
 
             // Determine if the event should occur on the selected date based on its recurrence type and interval
@@ -435,5 +429,36 @@ class CalendarFragment : Fragment() {
 
     private fun validRepeat(value: Double, interval: Int): Boolean {
         return value >= 0 && value % interval == 0.0  // Check if value is divisible by the interval
+    }
+
+    private fun curtainControl(show: Boolean) {
+        if (show) {
+            layoutView.findViewById<View>(R.id.vCurtain).apply {
+                visibility = View.VISIBLE
+                alpha = 1f
+            }
+            layoutView.findViewById<ProgressBar>(R.id.progressBar).apply {
+                visibility = View.VISIBLE
+                alpha = 1f
+            }
+        } else {
+            // Fade out the curtain view
+            layoutView.findViewById<View>(R.id.vCurtain).animate()
+                .alpha(0f)           // Target alpha value for fade-out
+                .setDuration(500)    // Duration of the fade-out in milliseconds
+                .withEndAction {
+                    layoutView.findViewById<View>(R.id.vCurtain).visibility = View.GONE
+                }
+
+            // Fade out the progress bar
+            layoutView.findViewById<ProgressBar>(R.id.progressBar).animate()
+                .alpha(0f)
+                .setDuration(500)
+                .withEndAction {
+                    layoutView.findViewById<ProgressBar>(R.id.progressBar).visibility =
+                        ProgressBar.GONE
+                }
+        }
+
     }
 }
