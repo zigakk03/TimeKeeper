@@ -31,4 +31,5 @@
     <string name="add_reminder_notification">Notification:</string>
     <string name="add_reminder_select_repeat">Select repeat</string>
     <string name="add_reminder_select_notification">Select notification</string>
+    <string name="edit_event_tile">Edit Event</string>
 </resources>

@@ -44,9 +44,12 @@ class HomeFragment : Fragment() {
         }
 
         // Set the floating button onClick to navigate to add reminder screen
-        view.findViewById<FloatingActionButton>(R.id.fBtnAddNotification).setOnClickListener { Navigation.findNavController(view).navigate(
-            R.id.navigate_to_add_reminder
-        ) }
+        view.findViewById<FloatingActionButton>(R.id.fBtnAddNotification).setOnClickListener {
+            // Sets the navigation arguments
+            val action = HomeFragmentDirections.navigateToAddReminder(null)
+            // Navigates to edit reminder page
+            Navigation.findNavController(view).navigate(action)
+        }
 
         view.findViewById<FloatingActionButton>(R.id.fBtnToCalendar).setOnClickListener { Navigation.findNavController(view).navigate(
             R.id.navigate_home_to_calendar

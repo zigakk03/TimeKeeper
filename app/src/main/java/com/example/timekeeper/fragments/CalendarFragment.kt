@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -12,14 +11,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.transition.Visibility
 import com.example.timekeeper.R
 import com.example.timekeeper.adapters.CalendarAdapter
 import com.example.timekeeper.adapters.EventAdapter
@@ -32,13 +29,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import kotlin.concurrent.thread
-import kotlin.math.roundToLong
 
 class CalendarFragment : Fragment() {
 
@@ -124,9 +118,10 @@ class CalendarFragment : Fragment() {
         calendarRecyclerView.addOnItemTouchListener(itemTouchListener)
 
         view.findViewById<FloatingActionButton>(R.id.fBtnAddEvent).setOnClickListener {
-            Navigation.findNavController(view).navigate(
-                R.id.navigate_calendar_to_newReminder
-            )
+            // Sets the navigation arguments
+            val action = CalendarFragmentDirections.navigateCalendarToNewReminder(selectedDay)
+            // Navigates to edit reminder page
+            Navigation.findNavController(view).navigate(action)
         }
 
         return view
@@ -152,16 +147,11 @@ class CalendarFragment : Fragment() {
     fun updateCalendar() {
         // Update UI components immediately with the basics
         updateMonthYearText()
-        curtainControl(true)
         CoroutineScope(Dispatchers.Main).launch {
             val days = loadCalendarCells() // Load calendar cells in the background
 
             loadEvents(days)
-
         }
-        Handler(Looper.getMainLooper()).postDelayed({
-            curtainControl(false)
-        }, 500)
     }
 
     private fun updateMonthYearText() {
@@ -304,6 +294,7 @@ class CalendarFragment : Fragment() {
 
         customCalendarAdapter.updateEvents(eventsTransfer)
 
+        curtainHide()
     }
 
 
@@ -351,12 +342,14 @@ class CalendarFragment : Fragment() {
     // Go to next month
     private fun onSwipeLeft() {
         selectedMonth = selectedMonth.plusMonths(1)
+        curtainShow()
         updateCalendar()
     }
 
     // Go to previous month
     private fun onSwipeRight() {
         selectedMonth = selectedMonth.minusMonths(1)
+        curtainShow()
         updateCalendar()
     }
 
@@ -431,34 +424,33 @@ class CalendarFragment : Fragment() {
         return value >= 0 && value % interval == 0.0  // Check if value is divisible by the interval
     }
 
-    private fun curtainControl(show: Boolean) {
-        if (show) {
-            layoutView.findViewById<View>(R.id.vCurtain).apply {
-                visibility = View.VISIBLE
-                alpha = 1f
-            }
-            layoutView.findViewById<ProgressBar>(R.id.progressBar).apply {
-                visibility = View.VISIBLE
-                alpha = 1f
-            }
-        } else {
-            // Fade out the curtain view
-            layoutView.findViewById<View>(R.id.vCurtain).animate()
-                .alpha(0f)           // Target alpha value for fade-out
-                .setDuration(500)    // Duration of the fade-out in milliseconds
-                .withEndAction {
-                    layoutView.findViewById<View>(R.id.vCurtain).visibility = View.GONE
-                }
-
-            // Fade out the progress bar
-            layoutView.findViewById<ProgressBar>(R.id.progressBar).animate()
-                .alpha(0f)
-                .setDuration(500)
-                .withEndAction {
-                    layoutView.findViewById<ProgressBar>(R.id.progressBar).visibility =
-                        ProgressBar.GONE
-                }
+    private fun curtainShow() {
+        layoutView.findViewById<View>(R.id.vCurtain).apply {
+            visibility = View.VISIBLE
+            alpha = 1f
         }
+        layoutView.findViewById<ProgressBar>(R.id.progressBar).apply {
+            visibility = View.VISIBLE
+            alpha = 1f
+        }
+    }
 
+    private fun curtainHide() {
+        // Fade out the curtain view
+        layoutView.findViewById<View>(R.id.vCurtain).animate()
+            .alpha(0f)           // Target alpha value for fade-out
+            .setDuration(500)    // Duration of the fade-out in milliseconds
+            .withEndAction {
+                layoutView.findViewById<View>(R.id.vCurtain).visibility = View.GONE
+            }
+
+        // Fade out the progress bar
+        layoutView.findViewById<ProgressBar>(R.id.progressBar).animate()
+            .alpha(0f)
+            .setDuration(500)
+            .withEndAction {
+                layoutView.findViewById<ProgressBar>(R.id.progressBar).visibility =
+                    ProgressBar.GONE
+            }
     }
 }

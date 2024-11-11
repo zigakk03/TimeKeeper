@@ -2,14 +2,11 @@ package com.example.timekeeper.fragments
 
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
-import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,12 +14,10 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Switch
 import android.widget.TextView
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
-import androidx.navigation.fragment.navArgs
 import com.example.timekeeper.R
 import com.example.timekeeper.adapters.NotificationAdapter
 import com.example.timekeeper.database.Event
@@ -40,7 +35,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
 
-class NewReminderFragment : Fragment() {
+class editEventFragment : Fragment() {
 
     private lateinit var view: View
 
@@ -58,26 +53,15 @@ class NewReminderFragment : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
-    @SuppressLint("SetTextI18n")
     @OptIn(ExperimentalStdlibApi::class)
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_new_reminder_event, container, false)
+        view = inflater.inflate(R.layout.fragment_edit_event, container, false)
 
-        val args: NewReminderFragmentArgs by navArgs()
-        if (args.eventDay != null) {
-            startDate = args.eventDay!!
-            endDate = args.eventDay!!
-            switchSelection(true)
-            view.findViewById<Switch>(R.id.swSelection).isChecked = true
-        } else {
-            // Disables the buttons
-            switchSelection(false)
-        }
+        // todo - load event from database
 
         // Sets the start and end dates to today's date
         view.findViewById<TextView>(R.id.txtStartDate).setText(startDate.format(
@@ -111,7 +95,7 @@ class NewReminderFragment : Fragment() {
                 .show()
         }
 
-        // Set btnSave onClick
+        /* todo Set btnSave onClick
         view.findViewById<ImageButton>(R.id.btnSave).setOnClickListener {
             // Database setup
             val db = ReminderDatabase.getDatabase(requireContext())
@@ -221,18 +205,15 @@ class NewReminderFragment : Fragment() {
 
                     // Sets the color of the text to black after 2s
                     Handler(Looper.getMainLooper()).postDelayed({
-                        iTxtTitle.setHintTextColor(ContextCompat.getColor(requireContext(),
+                        iTxtTitle.setHintTextColor(
+                            ContextCompat.getColor(requireContext(),
                             R.color.black
                         ))
                     }, 2000)
                 }
             }
         }
-
-        // Sets the selection switch function
-        view.findViewById<Switch>(R.id.swSelection).setOnCheckedChangeListener { switchView, isChecked ->
-            switchSelection(isChecked)
-        }
+        */
 
         // Start date button
         view.findViewById<ImageButton>(R.id.btnStartDate).setOnClickListener {
@@ -389,83 +370,4 @@ class NewReminderFragment : Fragment() {
         return view
     }
 
-    // Function switches the opacity and if the buttons are enabled
-    private fun switchSelection(isChecked: Boolean){
-        if (isChecked){
-            view.findViewById<View>(R.id.vContainer1).alpha = 1.0F
-            view.findViewById<View>(R.id.vContainer2).alpha = 1.0F
-            view.findViewById<View>(R.id.vLine1).alpha = 1.0F
-            view.findViewById<View>(R.id.vLine2).alpha = 1.0F
-            view.findViewById<View>(R.id.vLine3).alpha = 1.0F
-            view.findViewById<View>(R.id.vClockIcon).alpha = 1.0F
-            view.findViewById<TextView>(R.id.txtStart).alpha = 1.0F
-            view.findViewById<TextView>(R.id.txtEnd).alpha = 1.0F
-            view.findViewById<TextView>(R.id.txtStartDate).alpha = 1.0F
-            view.findViewById<TextView>(R.id.txtEndDate).alpha = 1.0F
-            view.findViewById<TextView>(R.id.txtRepeat).alpha = 1.0F
-            view.findViewById<TextView>(R.id.txtRepeatText).alpha = 1.0F
-            view.findViewById<TextView>(R.id.txtEventReminderTime).alpha = 1.0F
-            view.findViewById<TextView>(R.id.txtEventReminderTimeText).alpha = 1.0F
-            view.findViewById<ImageButton>(R.id.btnStartDate).apply {
-                alpha = 1.0F
-                isEnabled = true
-            }
-            view.findViewById<ImageButton>(R.id.btnEndDate).apply {
-                alpha = 1.0F
-                isEnabled = true
-            }
-            view.findViewById<ImageButton>(R.id.btnRepeat).apply {
-                alpha = 1.0F
-                isEnabled = true
-            }
-            view.findViewById<ImageButton>(R.id.btnEventReminderTime).apply {
-                alpha = 1.0F
-                isEnabled = true
-            }
-            view.findViewById<Switch>(R.id.swIncludesTime).apply {
-                alpha = 1.0F
-                isEnabled = true
-            }
-
-            view.findViewById<TextView>(R.id.txtTitle).setText(R.string.add_page_title2)
-        }
-        else {
-            view.findViewById<View>(R.id.vContainer1).alpha = 0.5F
-            view.findViewById<View>(R.id.vContainer2).alpha = 0.5F
-            view.findViewById<View>(R.id.vLine1).alpha = 0.5F
-            view.findViewById<View>(R.id.vLine2).alpha = 0.5F
-            view.findViewById<View>(R.id.vLine3).alpha = 0.5F
-            view.findViewById<View>(R.id.vClockIcon).alpha = 0.5F
-            view.findViewById<TextView>(R.id.txtStart).alpha = 0.5F
-            view.findViewById<TextView>(R.id.txtEnd).alpha = 0.5F
-            view.findViewById<TextView>(R.id.txtStartDate).alpha = 0.5F
-            view.findViewById<TextView>(R.id.txtEndDate).alpha = 0.5F
-            view.findViewById<TextView>(R.id.txtRepeat).alpha = 0.5F
-            view.findViewById<TextView>(R.id.txtRepeatText).alpha = 0.5F
-            view.findViewById<TextView>(R.id.txtEventReminderTime).alpha = 0.5F
-            view.findViewById<TextView>(R.id.txtEventReminderTimeText).alpha = 0.5F
-            view.findViewById<ImageButton>(R.id.btnStartDate).apply {
-                alpha = 0.5F
-                isEnabled = false
-            }
-            view.findViewById<ImageButton>(R.id.btnEndDate).apply {
-                alpha = 0.5F
-                isEnabled = false
-            }
-            view.findViewById<ImageButton>(R.id.btnRepeat).apply {
-                alpha = 0.5F
-                isEnabled = false
-            }
-            view.findViewById<ImageButton>(R.id.btnEventReminderTime).apply {
-                alpha = 0.5F
-                isEnabled = false
-            }
-            view.findViewById<Switch>(R.id.swIncludesTime).apply {
-                alpha = 0.5F
-                isEnabled = false
-            }
-
-            view.findViewById<TextView>(R.id.txtTitle).setText(R.string.add_page_title1)
-        }
-    }
 }

@@ -27,6 +27,11 @@
             app:popEnterAnim="@android:anim/slide_in_left"
             app:popExitAnim="@android:anim/fade_out"
             app:popUpTo="@id/homeFragment" />
+        <argument
+            android:name="eventDay"
+            app:argType="java.time.LocalDate"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
     <fragment
         android:id="@+id/homeFragment"
@@ -88,5 +93,29 @@
             app:popEnterAnim="@android:anim/slide_in_left"
             app:popExitAnim="@android:anim/fade_out"
             app:popUpTo="@id/calendarFragment" />
+        <action
+            android:id="@+id/navigate_calendar_to_editEvent"
+            app:destination="@id/editEventFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/editEventFragment"
+        android:name="com.example.timekeeper.fragments.editEventFragment"
+        android:label="fragment_edit_event"
+        tools:layout="@layout/fragment_edit_event" >
+        <action
+            android:id="@+id/action_editEventFragment_to_calendarFragment"
+            app:destination="@id/calendarFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/fade_out"
+            app:popUpTo="@id/calendarFragment" />
+        <argument
+            android:name="eventId"
+            app:argType="integer" />
     </fragment>
 </navigation>

@@ -16,6 +16,7 @@ import com.example.timekeeper.R
 import com.example.timekeeper.database.Event
 import com.example.timekeeper.database.ReminderDatabase
 import com.example.timekeeper.fragments.CalendarFragment
+import com.example.timekeeper.fragments.CalendarFragmentDirections
 import com.example.timekeeper.fragments.HomeFragmentDirections
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
@@ -81,15 +82,14 @@ class EventAdapter(
             }
         }
 
-        /*
+
         // Set btnEdit onClick
         holder.itemView.findViewById<ImageButton>(R.id.btnEdit).setOnClickListener {
             // Sets the navigation arguments
-            val action = HomeFragmentDirections.navigateHomeToEditReminder(curEvent.id)
+            val action = CalendarFragmentDirections.navigateCalendarToEditEvent(curEvent.id)
             // Navigates to edit reminder page
             Navigation.findNavController(holder.itemView).navigate(action)
         }
-         */
     }
 
     override fun getItemCount(): Int {
