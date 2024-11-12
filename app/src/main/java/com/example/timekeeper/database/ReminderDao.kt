@@ -26,6 +26,9 @@ interface ReminderDao {
     @Query("SELECT * FROM reminder WHERE id=:id")
     suspend fun getReminder(id: Int): Reminder
 
+
+    // ----- Event -----
+
     @Upsert
     suspend fun upsertEvent(event: Event)
 
@@ -35,4 +38,7 @@ interface ReminderDao {
     // Temporary delete
     @Delete
     suspend fun deleteEvent(event: Event)
+
+    @Query("SELECT * FROM event WHERE id=:id")
+    suspend fun getEvent(id: Int): Event
 }

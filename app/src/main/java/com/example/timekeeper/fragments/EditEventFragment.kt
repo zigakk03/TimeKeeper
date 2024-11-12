@@ -2,8 +2,10 @@ package com.example.timekeeper.fragments
 
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -18,10 +20,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.navArgs
 import com.example.timekeeper.R
-import com.example.timekeeper.adapters.NotificationAdapter
 import com.example.timekeeper.database.Event
-import com.example.timekeeper.database.Reminder
 import com.example.timekeeper.database.ReminderDatabase
 import com.example.timekeeper.database.RepeatType
 import com.example.timekeeper.helpers.RepeatDialog
@@ -29,7 +30,6 @@ import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -53,6 +53,7 @@ class editEventFragment : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
+    @SuppressLint("SetTextI18n")
     @OptIn(ExperimentalStdlibApi::class)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,16 +62,81 @@ class editEventFragment : Fragment() {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_edit_event, container, false)
 
-        // todo - load event from database
-
-        // Sets the start and end dates to today's date
-        view.findViewById<TextView>(R.id.txtStartDate).setText(startDate.format(
-            DateTimeFormatter.ofPattern("d. M. yyyy")))
-        view.findViewById<TextView>(R.id.txtEndDate).setText(endDate.format(
-            DateTimeFormatter.ofPattern("d. M. yyyy")))
-
         // Variable of the colorButton background color
         var colorButton = ContextCompat.getColor(requireContext(), R.color.accent)
+
+        val args: editEventFragmentArgs by navArgs()
+        lifecycleScope.launch {
+            // Database setup
+            val db = ReminderDatabase.getDatabase(requireContext())
+            val eventDao = db.reminderDao()
+            // Gets a reminder based on the given id
+            val selectedEvent = eventDao.getEvent(args.eventId)
+
+            // Sets the colorButton to color of the gotten reminder
+            colorButton = Color.parseColor(selectedEvent.color)
+            // Fills the views with the gotten reminder
+            view.findViewById<ImageButton>(R.id.btnColorPicker).setBackgroundColor(colorButton)
+            view.findViewById<EditText>(R.id.iTxtTitle).setText(selectedEvent.title)
+            view.findViewById<EditText>(R.id.iTxtDescription).setText(selectedEvent.description)
+            startDate = selectedEvent.startDate
+            endDate = selectedEvent.endDate
+            startTime = selectedEvent.startTime?: LocalTime.now()
+            endTime = selectedEvent.endTime?: LocalTime.now()
+
+            if (selectedEvent.startTime != null) {
+                view.findViewById<Switch>(R.id.swIncludesTime).isChecked = true
+                view.findViewById<TextView>(R.id.txtStartDate).text = (startTime.format(
+                    DateTimeFormatter.ofPattern("HH:mm")) + "    " + startDate.format(
+                    DateTimeFormatter.ofPattern("d. M. yyyy")))
+
+                view.findViewById<TextView>(R.id.txtEndDate).text = (endTime.format(
+                    DateTimeFormatter.ofPattern("HH:mm")) + "    " + endDate.format(
+                    DateTimeFormatter.ofPattern("d. M. yyyy")))
+            }
+            else {
+                // Sets the start and end dates to set date
+                view.findViewById<TextView>(R.id.txtStartDate).setText(startDate.format(
+                    DateTimeFormatter.ofPattern("d. M. yyyy")))
+                view.findViewById<TextView>(R.id.txtEndDate).setText(endDate.format(
+                    DateTimeFormatter.ofPattern("d. M. yyyy")))
+            }
+
+            repeatPeriod = when(selectedEvent.repeatType) {
+                RepeatType.DAILY -> "day"
+                RepeatType.WEEKLY -> "week"
+                RepeatType.MONTHLY -> "month"
+                RepeatType.YEARLY -> "year"
+                else -> ""
+            }
+            interval = selectedEvent.repeatInterval
+            endRepeatDate = selectedEvent.repeatEnd
+
+            if (repeatPeriod == ""){
+                view.findViewById<TextView>(R.id.txtRepeatText).text = ""
+            }
+            else if (interval > 1) {
+                if (endRepeatDate == null) {
+                    view.findViewById<TextView>(R.id.txtRepeatText).text =
+                        "Every " + interval + " " + repeatPeriod + "s"
+                }
+                else {
+                    view.findViewById<TextView>(R.id.txtRepeatText).text =
+                        "Every " + interval + " " + repeatPeriod + "s | " + endRepeatDate!!.format(DateTimeFormatter.ofPattern("d. M. yyyy"))
+                }
+            }
+            else {
+                if (endRepeatDate == null) {
+                    view.findViewById<TextView>(R.id.txtRepeatText).text =
+                        "Every $repeatPeriod"
+                }
+                else {
+                    view.findViewById<TextView>(R.id.txtRepeatText).text =
+                        "Every $repeatPeriod | "+ endRepeatDate!!.format(DateTimeFormatter.ofPattern("d. M. yyyy"))
+                }
+            }
+        }
+
         // Set btnColorPicker onClick
         view.findViewById<ImageButton>(R.id.btnColorPicker).setOnClickListener {
             // Open ColorPickerDialogBuilder
@@ -95,7 +161,6 @@ class editEventFragment : Fragment() {
                 .show()
         }
 
-        /* todo Set btnSave onClick
         view.findViewById<ImageButton>(R.id.btnSave).setOnClickListener {
             // Database setup
             val db = ReminderDatabase.getDatabase(requireContext())
@@ -104,12 +169,11 @@ class editEventFragment : Fragment() {
             lifecycleScope.launch {
                 // Check if iTxtTitle is empty
                 if (!view.findViewById<EditText>(R.id.iTxtTitle).text.isNullOrEmpty()) {
-                    // Values of a reminder / event
+                    // Values of a event
                     val titleTxt = view.findViewById<EditText>(R.id.iTxtTitle).text.toString()
                     val descriptionTxt = view.findViewById<EditText>(R.id.iTxtDescription).text.toString()
                     val notificationColor = '#'+colorButton.toHexString()
 
-                    if (view.findViewById<Switch>(R.id.swSelection).isChecked) {
                         val repeatType = when(repeatPeriod) {
                             "day" -> RepeatType.DAILY
                             "week" -> RepeatType.WEEKLY
@@ -121,7 +185,7 @@ class editEventFragment : Fragment() {
                         if (view.findViewById<Switch>(R.id.swIncludesTime).isChecked) {
                             reminderDao.upsertEvent(
                                 Event(
-                                    0,
+                                    args.eventId,
                                     notificationColor,
                                     titleTxt,
                                     descriptionTxt,
@@ -138,7 +202,7 @@ class editEventFragment : Fragment() {
                         else {
                             reminderDao.upsertEvent(
                                 Event(
-                                    0,
+                                    args.eventId,
                                     notificationColor,
                                     titleTxt,
                                     descriptionTxt,
@@ -154,34 +218,8 @@ class editEventFragment : Fragment() {
                         }
 
                         // Navigates to the calender page
-                        Navigation.findNavController(view).navigate(R.id.navigate_newReminder_to_calendar)
-                    }
-                    else {
-                        // Reminder
-                        // Inserts a new reminder and gets its id
-                        val reminderId = reminderDao.upsertReminder(
-                            Reminder(
-                                0,
-                                notificationColor,
-                                titleTxt,
-                                descriptionTxt,
-                                LocalDateTime.now(),
-                                null
-                            )
-                        )
+                        Navigation.findNavController(view).navigate(R.id.navigate_editEvent_to_calendar)
 
-                        // Shows a new notification referring to the previously created reminder
-                        NotificationAdapter.createAndShowNotification(
-                            requireContext(),
-                            notificationColor,
-                            titleTxt,
-                            descriptionTxt,
-                            reminderId.toInt()
-                        )
-
-                        // Navigates back to the home page
-                        Navigation.findNavController(view).navigate(R.id.navigate_newReminder_to_home)
-                    }
                 }
                 else {
                     // Find the iTxtTitle view
@@ -213,7 +251,6 @@ class editEventFragment : Fragment() {
                 }
             }
         }
-        */
 
         // Start date button
         view.findViewById<ImageButton>(R.id.btnStartDate).setOnClickListener {
