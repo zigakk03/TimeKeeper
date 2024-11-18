@@ -43,7 +43,7 @@ class CalendarFragment : Fragment() {
     private var selectedMonth = LocalDate.now()
 
     // Selected day variable - default today's date
-    private var selectedDay = LocalDate.now()
+    var selectedDay = LocalDate.now()
 
     // Date format
     private val dateFormat = DateTimeFormatter.ofPattern("yyyy-M-d")
@@ -383,14 +383,14 @@ class CalendarFragment : Fragment() {
             // Notification RecyclerView setup
             val notificationRecyclerView: RecyclerView = layoutView.findViewById(R.id.rvEvents)
             notificationRecyclerView.layoutManager = LinearLayoutManager(context)
-            val customReminderAdapter =
+            val customEventAdapter =
                 EventAdapter(
                     filterdEvents,
                     requireContext(),
                     lifecycleScope,
                     this@CalendarFragment
                 )
-            notificationRecyclerView.adapter = customReminderAdapter
+            notificationRecyclerView.adapter = customEventAdapter
         }
     }
 

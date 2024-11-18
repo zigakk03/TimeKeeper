@@ -3,17 +3,22 @@ package com.example.timekeeper.fragments
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ListView
 import android.widget.Switch
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -174,6 +179,34 @@ class editEventFragment : Fragment() {
                     val descriptionTxt = view.findViewById<EditText>(R.id.iTxtDescription).text.toString()
                     val notificationColor = '#'+colorButton.toHexString()
 
+                    val dialogView = layoutInflater.inflate(R.layout.alert_dialog, null)
+                    dialogView.findViewById<TextView>(R.id.txtAlertDialogTitle).text = "How do you want to update?"
+
+                    val options: Array<String> = arrayOf("Update only this event",
+                        "Update this and all future events",
+                        "Update all occurrences of this event")
+
+                    // Set up the ListView
+                    val listView = dialogView.findViewById<ListView>(R.id.lvOptions)
+                    val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, options)
+                    listView.adapter = adapter
+
+                    // Handle item clicks
+                    listView.setOnItemClickListener { _, _, i, _ ->
+                        val selectedOption = options[i]
+                        Log.i("---- Test ----", "onCreateView: $selectedOption")
+                    }
+
+                    AlertDialog.Builder(requireContext(), R.style.AlertDialog)
+                        .setView(dialogView)
+                        .setNegativeButton("Cancel") { dialog, _ ->
+                        dialog.dismiss()
+                        }
+                        .create()
+                        .show()
+
+                    /* todo - handle update
+
                         val repeatType = when(repeatPeriod) {
                             "day" -> RepeatType.DAILY
                             "week" -> RepeatType.WEEKLY
@@ -219,8 +252,10 @@ class editEventFragment : Fragment() {
 
                         // Navigates to the calender page
                         Navigation.findNavController(view).navigate(R.id.navigate_editEvent_to_calendar)
+                    */
 
                 }
+                // Title animation for when title is empty
                 else {
                     // Find the iTxtTitle view
                     val iTxtTitle = view.findViewById<EditText>(R.id.iTxtTitle)

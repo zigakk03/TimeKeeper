@@ -7,7 +7,7 @@
     android:background="@color/jet">
 
     <View
-        android:id="@+id/view"
+        android:id="@+id/vTitleBackground"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:background="@color/black"
@@ -24,7 +24,7 @@
         android:focusable="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view">
+        app:layout_constraintTop_toBottomOf="@+id/vTitleBackground">
 
         <TextView
             android:id="@+id/textView1"
@@ -241,7 +241,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
-        android:id="@+id/txtRecurrenceDialogTitle"
+        android:id="@+id/txtAlertDialogTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -249,9 +249,9 @@
         android:textColor="@color/white"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/view"
-        app:layout_constraintStart_toStartOf="@+id/view"
-        app:layout_constraintTop_toTopOf="@+id/view" />
+        app:layout_constraintBottom_toBottomOf="@+id/vTitleBackground"
+        app:layout_constraintStart_toStartOf="@+id/vTitleBackground"
+        app:layout_constraintTop_toTopOf="@+id/vTitleBackground" />
 
     <View
         android:id="@+id/line7"

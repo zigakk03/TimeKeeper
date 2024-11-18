@@ -64,7 +64,7 @@ class EventAdapter(
             holder.itemView.findViewById<TextView>(R.id.tvTime).text = ""
         }
 
-        // Set btnDelete onClick
+        // Set btnDelete onClick todo - complicated delete
         holder.itemView.findViewById<ImageButton>(R.id.btnDelete).setOnClickListener {
             lifecycleScope.launch {
                 // Database setup
@@ -86,7 +86,7 @@ class EventAdapter(
         // Set btnEdit onClick
         holder.itemView.findViewById<ImageButton>(R.id.btnEdit).setOnClickListener {
             // Sets the navigation arguments
-            val action = CalendarFragmentDirections.navigateCalendarToEditEvent(curEvent.id)
+            val action = CalendarFragmentDirections.navigateCalendarToEditEvent(curEvent.id, calendarFragment.selectedDay)
             // Navigates to edit reminder page
             Navigation.findNavController(holder.itemView).navigate(action)
         }
@@ -96,14 +96,4 @@ class EventAdapter(
         return eventDataLists.size
     }
 
-    /*
-    // Removes and updates reminderDataLists of the given reminder id
-    fun removeAndUpdateList(id: Int){
-        val reminder = eventDataLists.find { it.id == id }
-        val position = eventDataLists.indexOf(reminder)
-        eventDataLists.removeAt(position)
-        notifyItemRemoved(position)
-        notifyItemRangeChanged(position, itemCount)
-    }
-     */
 }

@@ -117,5 +117,8 @@
         <argument
             android:name="eventId"
             app:argType="integer" />
+        <argument
+            android:name="selectedDay"
+            app:argType="java.time.LocalDate" />
     </fragment>
 </navigation>

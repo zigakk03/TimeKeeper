@@ -55,6 +55,13 @@
         <item name="colorOnPrimary">@color/accent</item>
     </style>
 
+    <style name="AlertDialog" parent="android:Theme.Material.Dialog.Alert">
+        <item name="android:headerBackground">@color/black</item>
+        <item name="android:background">@color/jet</item>
+        <item name="android:windowBackground">@drawable/rounded_corners_dark</item>
+        <item name="colorOnPrimary">@color/accent</item>
+    </style>
+
     <style name="ColorPickerDialog">
         <!-- Set background color for the dialog -->
         <item name="android:windowBackground">@drawable/rounded_corners_dark</item>
