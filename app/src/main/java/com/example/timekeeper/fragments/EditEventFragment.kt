@@ -6,7 +6,6 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
@@ -37,6 +36,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.Calendar
 
 
@@ -53,6 +53,8 @@ class editEventFragment : Fragment() {
     private var repeatPeriod: String = ""
     private var interval: Int = 1
     private var endRepeatDate: LocalDate? = null
+
+    lateinit var selectedEvent: Event
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,7 +78,7 @@ class editEventFragment : Fragment() {
             val db = ReminderDatabase.getDatabase(requireContext())
             val eventDao = db.reminderDao()
             // Gets a reminder based on the given id
-            val selectedEvent = eventDao.getEvent(args.eventId)
+            selectedEvent = eventDao.getEvent(args.eventId)
 
             // Sets the colorButton to color of the gotten reminder
             colorButton = Color.parseColor(selectedEvent.color)
@@ -170,89 +172,323 @@ class editEventFragment : Fragment() {
             // Database setup
             val db = ReminderDatabase.getDatabase(requireContext())
             val reminderDao = db.reminderDao()
-
-            lifecycleScope.launch {
                 // Check if iTxtTitle is empty
                 if (!view.findViewById<EditText>(R.id.iTxtTitle).text.isNullOrEmpty()) {
-                    // Values of a event
+                    // Values of an event
                     val titleTxt = view.findViewById<EditText>(R.id.iTxtTitle).text.toString()
                     val descriptionTxt = view.findViewById<EditText>(R.id.iTxtDescription).text.toString()
                     val notificationColor = '#'+colorButton.toHexString()
-
-                    val dialogView = layoutInflater.inflate(R.layout.alert_dialog, null)
-                    dialogView.findViewById<TextView>(R.id.txtAlertDialogTitle).text = "How do you want to update?"
-
-                    val options: Array<String> = arrayOf("Update only this event",
-                        "Update this and all future events",
-                        "Update all occurrences of this event")
-
-                    // Set up the ListView
-                    val listView = dialogView.findViewById<ListView>(R.id.lvOptions)
-                    val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, options)
-                    listView.adapter = adapter
-
-                    // Handle item clicks
-                    listView.setOnItemClickListener { _, _, i, _ ->
-                        val selectedOption = options[i]
-                        Log.i("---- Test ----", "onCreateView: $selectedOption")
+                    val repeatType = when(repeatPeriod) {
+                        "day" -> RepeatType.DAILY
+                        "week" -> RepeatType.WEEKLY
+                        "month" -> RepeatType.MONTHLY
+                        "year" -> RepeatType.YEARLY
+                        else -> RepeatType.NONE
                     }
 
-                    AlertDialog.Builder(requireContext(), R.style.AlertDialog)
-                        .setView(dialogView)
-                        .setNegativeButton("Cancel") { dialog, _ ->
-                        dialog.dismiss()
+                    if (selectedEvent.repeatType != RepeatType.NONE) {
+
+                        val dialogView = layoutInflater.inflate(R.layout.alert_dialog, null)
+                        dialogView.findViewById<TextView>(R.id.txtAlertDialogTitle).text =
+                            "How do you want to update?"
+
+                        val optionsDialog =
+                            AlertDialog.Builder(requireContext(), R.style.AlertDialog)
+                                .setView(dialogView)
+                                .setNegativeButton("Cancel") { dialog, _ ->
+                                    dialog.dismiss()
+                                }
+                                .create()
+
+                        val options: Array<String> = arrayOf(
+                            "Update only this event",
+                            "Update this and all future events",
+                            "Update all occurrences of this event"
+                        )
+
+                        // Set up the ListView
+                        val listView = dialogView.findViewById<ListView>(R.id.lvOptions)
+                        val adapter = ArrayAdapter(
+                            requireContext(),
+                            android.R.layout.simple_list_item_1,
+                            options
+                        )
+                        listView.adapter = adapter
+
+                        // Handle item clicks
+                        listView.setOnItemClickListener { _, _, i, _ ->
+                            val selectedOption = options[i]
+                            Log.i("---- Test ----", "onCreateView: $selectedOption | $i")
+
+                            when (i) {
+                                0 -> {
+                                    lifecycleScope.launch {
+                                        val nextEvent = when (selectedEvent.repeatType) {
+                                            RepeatType.DAILY -> args.selectedDay.plusDays(
+                                                selectedEvent.repeatInterval.toLong()
+                                            )
+
+                                            RepeatType.WEEKLY -> args.selectedDay.plusWeeks(
+                                                selectedEvent.repeatInterval.toLong()
+                                            )
+
+                                            RepeatType.MONTHLY -> args.selectedDay.plusMonths(
+                                                selectedEvent.repeatInterval.toLong()
+                                            )
+
+                                            RepeatType.YEARLY -> args.selectedDay.plusYears(
+                                                selectedEvent.repeatInterval.toLong()
+                                            )
+
+                                            else -> args.selectedDay
+                                        }
+                                        if (selectedEvent.repeatType != RepeatType.NONE && (nextEvent < selectedEvent.repeatEnd || selectedEvent.repeatEnd == null)) {
+                                            reminderDao.upsertEvent(
+                                                Event(
+                                                    0,
+                                                    selectedEvent.color,
+                                                    selectedEvent.title,
+                                                    selectedEvent.description,
+                                                    nextEvent,
+                                                    selectedEvent.startTime,
+                                                    nextEvent.plusDays(
+                                                        ChronoUnit.DAYS.between(
+                                                            selectedEvent.startDate,
+                                                            selectedEvent.endDate
+                                                        )
+                                                    ),
+                                                    selectedEvent.endTime,
+                                                    selectedEvent.repeatType,
+                                                    selectedEvent.repeatInterval,
+                                                    selectedEvent.repeatEnd
+                                                )
+                                            )
+                                        }
+
+                                        if (args.selectedDay != selectedEvent.startDate) {
+                                            reminderDao.upsertEvent(
+                                                Event(
+                                                    selectedEvent.id,
+                                                    selectedEvent.color,
+                                                    selectedEvent.title,
+                                                    selectedEvent.description,
+                                                    selectedEvent.startDate,
+                                                    selectedEvent.startTime,
+                                                    selectedEvent.endDate,
+                                                    selectedEvent.endTime,
+                                                    selectedEvent.repeatType,
+                                                    selectedEvent.repeatInterval,
+                                                    args.selectedDay.minusDays(1)
+                                                )
+                                            )
+                                        } else {
+                                            reminderDao.deleteEvent(selectedEvent)
+                                        }
+
+                                        if (view.findViewById<Switch>(R.id.swIncludesTime).isChecked) {
+                                            reminderDao.upsertEvent(
+                                                Event(
+                                                    0,
+                                                    notificationColor,
+                                                    titleTxt,
+                                                    descriptionTxt,
+                                                    args.selectedDay,
+                                                    startTime,
+                                                    args.selectedDay.plusDays(
+                                                        ChronoUnit.DAYS.between(
+                                                            startDate,
+                                                            endDate
+                                                        )
+                                                    ),
+                                                    endTime,
+                                                    RepeatType.NONE,
+                                                    1,
+                                                    null
+                                                )
+                                            )
+                                        } else {
+                                            reminderDao.upsertEvent(
+                                                Event(
+                                                    0,
+                                                    notificationColor,
+                                                    titleTxt,
+                                                    descriptionTxt,
+                                                    args.selectedDay,
+                                                    null,
+                                                    args.selectedDay.plusDays(
+                                                        ChronoUnit.DAYS.between(
+                                                            startDate,
+                                                            endDate
+                                                        )
+                                                    ),
+                                                    null,
+                                                    RepeatType.NONE,
+                                                    1,
+                                                    null
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+
+                                1 -> {
+                                    lifecycleScope.launch {
+                                        if (args.selectedDay != selectedEvent.startDate) {
+                                            reminderDao.upsertEvent(
+                                                Event(
+                                                    selectedEvent.id,
+                                                    selectedEvent.color,
+                                                    selectedEvent.title,
+                                                    selectedEvent.description,
+                                                    selectedEvent.startDate,
+                                                    selectedEvent.startTime,
+                                                    selectedEvent.endDate,
+                                                    selectedEvent.endTime,
+                                                    selectedEvent.repeatType,
+                                                    selectedEvent.repeatInterval,
+                                                    args.selectedDay.minusDays(1)
+                                                )
+                                            )
+                                        } else {
+                                            reminderDao.deleteEvent(selectedEvent)
+                                        }
+
+                                        if (view.findViewById<Switch>(R.id.swIncludesTime).isChecked) {
+                                            reminderDao.upsertEvent(
+                                                Event(
+                                                    0,
+                                                    notificationColor,
+                                                    titleTxt,
+                                                    descriptionTxt,
+                                                    args.selectedDay,
+                                                    startTime,
+                                                    args.selectedDay.plusDays(
+                                                        ChronoUnit.DAYS.between(
+                                                            startDate,
+                                                            endDate
+                                                        )
+                                                    ),
+                                                    endTime,
+                                                    repeatType,
+                                                    interval,
+                                                    endRepeatDate
+                                                )
+                                            )
+                                        } else {
+                                            reminderDao.upsertEvent(
+                                                Event(
+                                                    0,
+                                                    notificationColor,
+                                                    titleTxt,
+                                                    descriptionTxt,
+                                                    args.selectedDay,
+                                                    null,
+                                                    args.selectedDay.plusDays(
+                                                        ChronoUnit.DAYS.between(
+                                                            startDate,
+                                                            endDate
+                                                        )
+                                                    ),
+                                                    null,
+                                                    repeatType,
+                                                    interval,
+                                                    endRepeatDate
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+
+                                2 -> {
+                                    lifecycleScope.launch {
+                                        if (view.findViewById<Switch>(R.id.swIncludesTime).isChecked) {
+                                            reminderDao.upsertEvent(
+                                                Event(
+                                                    args.eventId,
+                                                    notificationColor,
+                                                    titleTxt,
+                                                    descriptionTxt,
+                                                    startDate,
+                                                    startTime,
+                                                    endDate,
+                                                    endTime,
+                                                    repeatType,
+                                                    interval,
+                                                    endRepeatDate
+                                                )
+                                            )
+                                        } else {
+                                            reminderDao.upsertEvent(
+                                                Event(
+                                                    args.eventId,
+                                                    notificationColor,
+                                                    titleTxt,
+                                                    descriptionTxt,
+                                                    startDate,
+                                                    null,
+                                                    endDate,
+                                                    null,
+                                                    repeatType,
+                                                    interval,
+                                                    endRepeatDate
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Navigates to the calender page
+                            Navigation.findNavController(view)
+                                .navigate(R.id.navigate_editEvent_to_calendar)
+
+                            // dismiss dialog
+                            optionsDialog.dismiss()
                         }
-                        .create()
-                        .show()
 
-                    /* todo - handle update
-
-                        val repeatType = when(repeatPeriod) {
-                            "day" -> RepeatType.DAILY
-                            "week" -> RepeatType.WEEKLY
-                            "month" -> RepeatType.MONTHLY
-                            "year" -> RepeatType.YEARLY
-                            else -> RepeatType.NONE
-                        }
-
-                        if (view.findViewById<Switch>(R.id.swIncludesTime).isChecked) {
-                            reminderDao.upsertEvent(
-                                Event(
-                                    args.eventId,
-                                    notificationColor,
-                                    titleTxt,
-                                    descriptionTxt,
-                                    startDate,
-                                    startTime,
-                                    endDate,
-                                    endTime,
-                                    repeatType,
-                                    interval,
-                                    endRepeatDate
+                        optionsDialog.show()
+                    }
+                    else {
+                        lifecycleScope.launch {
+                            if (view.findViewById<Switch>(R.id.swIncludesTime).isChecked) {
+                                reminderDao.upsertEvent(
+                                    Event(
+                                        args.eventId,
+                                        notificationColor,
+                                        titleTxt,
+                                        descriptionTxt,
+                                        startDate,
+                                        startTime,
+                                        endDate,
+                                        endTime,
+                                        repeatType,
+                                        interval,
+                                        endRepeatDate
+                                    )
                                 )
-                            )
-                        }
-                        else {
-                            reminderDao.upsertEvent(
-                                Event(
-                                    args.eventId,
-                                    notificationColor,
-                                    titleTxt,
-                                    descriptionTxt,
-                                    startDate,
-                                    null,
-                                    endDate,
-                                    null,
-                                    repeatType,
-                                    interval,
-                                    endRepeatDate
+                            } else {
+                                reminderDao.upsertEvent(
+                                    Event(
+                                        args.eventId,
+                                        notificationColor,
+                                        titleTxt,
+                                        descriptionTxt,
+                                        startDate,
+                                        null,
+                                        endDate,
+                                        null,
+                                        repeatType,
+                                        interval,
+                                        endRepeatDate
+                                    )
                                 )
-                            )
+                            }
                         }
 
                         // Navigates to the calender page
-                        Navigation.findNavController(view).navigate(R.id.navigate_editEvent_to_calendar)
-                    */
+                        Navigation.findNavController(view)
+                            .navigate(R.id.navigate_editEvent_to_calendar)
+                    }
 
                 }
                 // Title animation for when title is empty
@@ -284,7 +520,7 @@ class editEventFragment : Fragment() {
                         ))
                     }, 2000)
                 }
-            }
+
         }
 
         // Start date button

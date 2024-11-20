@@ -35,7 +35,6 @@ interface ReminderDao {
     @Query("SELECT * FROM event WHERE startDate <= :selectedDate AND (repeatEnd >= :selectedDate OR repeatEnd IS NULL)")
     suspend fun getEventsRelevantToSelectedDate(selectedDate: LocalDate? = LocalDate.now()): MutableList<Event>
 
-    // Temporary delete
     @Delete
     suspend fun deleteEvent(event: Event)
 

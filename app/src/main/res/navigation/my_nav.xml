@@ -113,7 +113,8 @@
             app:exitAnim="@android:anim/fade_out"
             app:popEnterAnim="@android:anim/slide_in_left"
             app:popExitAnim="@android:anim/fade_out"
-            app:popUpTo="@id/calendarFragment" />
+            app:popUpTo="@id/calendarFragment"
+            app:popUpToInclusive="true" />
         <argument
             android:name="eventId"
             app:argType="integer" />
