@@ -217,9 +217,6 @@ class editEventFragment : Fragment() {
 
                         // Handle item clicks
                         listView.setOnItemClickListener { _, _, i, _ ->
-                            val selectedOption = options[i]
-                            Log.i("---- Test ----", "onCreateView: $selectedOption | $i")
-
                             when (i) {
                                 0 -> {
                                     lifecycleScope.launch {
@@ -242,7 +239,7 @@ class editEventFragment : Fragment() {
 
                                             else -> args.selectedDay
                                         }
-                                        if (selectedEvent.repeatType != RepeatType.NONE && (nextEvent < selectedEvent.repeatEnd || selectedEvent.repeatEnd == null)) {
+                                        if (selectedEvent.repeatType != RepeatType.NONE && (nextEvent <= selectedEvent.repeatEnd || selectedEvent.repeatEnd == null)) {
                                             reminderDao.upsertEvent(
                                                 Event(
                                                     0,
