@@ -34,9 +34,9 @@ class EventAdapter(
     private val appContext: Context,
     private val lifecycleScope: LifecycleCoroutineScope,
     private val calendarFragment: CalendarFragment
-): RecyclerView.Adapter<EventAdapter.ReminderViewHolder>() {
+) : RecyclerView.Adapter<EventAdapter.ReminderViewHolder>() {
 
-    class ReminderViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
+    class ReminderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReminderViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -49,24 +49,31 @@ class EventAdapter(
     override fun onBindViewHolder(holder: ReminderViewHolder, position: Int) {
         val curEvent = eventDataLists[position]
         // If current reminder doesn't have a color, it uses the accent color
-        if (!curEvent.color.isNullOrEmpty()){
-            holder.itemView.findViewById<View>(R.id.vColorStrip).setBackgroundColor(Color.parseColor(curEvent.color))
+        if (!curEvent.color.isNullOrEmpty()) {
+            holder.itemView.findViewById<View>(R.id.vColorStrip)
+                .setBackgroundColor(Color.parseColor(curEvent.color))
         }
         // Set reminder attributes
         holder.itemView.findViewById<TextView>(R.id.tvTitle).text = curEvent.title
         holder.itemView.findViewById<TextView>(R.id.tvDescription).text = curEvent.description
         if (curEvent.startDate == curEvent.endDate) {
-            holder.itemView.findViewById<TextView>(R.id.tvDate).text = curEvent.startDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-        }
-        else {
-            holder.itemView.findViewById<TextView>(R.id.tvDate).text = curEvent.startDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))  + " - " + curEvent.endDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+            holder.itemView.findViewById<TextView>(R.id.tvDate).text =
+                curEvent.startDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+        } else {
+            holder.itemView.findViewById<TextView>(R.id.tvDate).text =
+                curEvent.startDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + " - " + curEvent.endDate.format(
+                    DateTimeFormatter.ofPattern("dd.MM.yyyy")
+                )
         }
         if (curEvent.startTime != null && curEvent.endTime != null) {
             if (curEvent.startTime.hour == curEvent.endTime.hour && curEvent.startTime.minute == curEvent.endTime.minute) {
-                holder.itemView.findViewById<TextView>(R.id.tvTime).text = curEvent.startTime.format(DateTimeFormatter.ofPattern("HH:mm"))
-            }
-            else {
-                holder.itemView.findViewById<TextView>(R.id.tvTime).text = curEvent.startTime.format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + curEvent.endTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+                holder.itemView.findViewById<TextView>(R.id.tvTime).text =
+                    curEvent.startTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+            } else {
+                holder.itemView.findViewById<TextView>(R.id.tvTime).text =
+                    curEvent.startTime.format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + curEvent.endTime.format(
+                        DateTimeFormatter.ofPattern("HH:mm")
+                    )
             }
         } else {
             holder.itemView.findViewById<TextView>(R.id.tvTime).text = ""
@@ -225,35 +232,34 @@ class EventAdapter(
                 }
 
                 optionsDialog.show()
-            }
-            else {
+            } else {
 
                 val dialogView = LayoutInflater.from(appContext)
                     .inflate(R.layout.alert_dialog, null)
                 dialogView.findViewById<TextView>(R.id.txtAlertDialogTitle).text =
                     "Are you sure?"
 
-                    AlertDialog.Builder(appContext, R.style.AlertDialog)
-                        .setView(dialogView)
-                        .setPositiveButton("Yes") { dialog, _ ->
-                            lifecycleScope.launch {
-                                // Delete the reminder in the database
-                                reminderDao.deleteEvent(curEvent)
+                AlertDialog.Builder(appContext, R.style.AlertDialog)
+                    .setView(dialogView)
+                    .setPositiveButton("Yes") { dialog, _ ->
+                        lifecycleScope.launch {
+                            // Delete the reminder in the database
+                            reminderDao.deleteEvent(curEvent)
 
-                                // Remove the reminder from the reminderDataLists
-                                eventDataLists.removeAt(position)
-                                // Notify the reminder removal
-                                notifyItemRemoved(position)
-                                notifyItemRangeChanged(position, itemCount)
-                                calendarFragment.updateCalendar()
-                                dialog.dismiss()
-                            }
-                        }
-                        .setNegativeButton("No") { dialog, _ ->
+                            // Remove the reminder from the reminderDataLists
+                            eventDataLists.removeAt(position)
+                            // Notify the reminder removal
+                            notifyItemRemoved(position)
+                            notifyItemRangeChanged(position, itemCount)
+                            calendarFragment.updateCalendar()
                             dialog.dismiss()
                         }
-                        .create()
-                        .show()
+                    }
+                    .setNegativeButton("No") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .create()
+                    .show()
 
             }
         }
@@ -262,7 +268,10 @@ class EventAdapter(
         // Set btnEdit onClick
         holder.itemView.findViewById<ImageButton>(R.id.btnEdit).setOnClickListener {
             // Sets the navigation arguments
-            val action = CalendarFragmentDirections.navigateCalendarToEditEvent(curEvent.id, calendarFragment.selectedDay)
+            val action = CalendarFragmentDirections.navigateCalendarToEditEvent(
+                curEvent.id,
+                calendarFragment.selectedDay
+            )
             // Navigates to edit reminder page
             Navigation.findNavController(holder.itemView).navigate(action)
         }
