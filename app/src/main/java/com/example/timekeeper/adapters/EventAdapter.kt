@@ -227,18 +227,34 @@ class EventAdapter(
                 optionsDialog.show()
             }
             else {
-                lifecycleScope.launch {
-                    // todo - are you sure
-                    // Delete the reminder in the database
-                    reminderDao.deleteEvent(curEvent)
 
-                    // Remove the reminder from the reminderDataLists
-                    eventDataLists.removeAt(position)
-                    // Notify the reminder removal
-                    notifyItemRemoved(position)
-                    notifyItemRangeChanged(position, itemCount)
-                    calendarFragment.updateCalendar()
-                }
+                val dialogView = LayoutInflater.from(appContext)
+                    .inflate(R.layout.alert_dialog, null)
+                dialogView.findViewById<TextView>(R.id.txtAlertDialogTitle).text =
+                    "Are you sure?"
+
+                    AlertDialog.Builder(appContext, R.style.AlertDialog)
+                        .setView(dialogView)
+                        .setPositiveButton("Yes") { dialog, _ ->
+                            lifecycleScope.launch {
+                                // Delete the reminder in the database
+                                reminderDao.deleteEvent(curEvent)
+
+                                // Remove the reminder from the reminderDataLists
+                                eventDataLists.removeAt(position)
+                                // Notify the reminder removal
+                                notifyItemRemoved(position)
+                                notifyItemRangeChanged(position, itemCount)
+                                calendarFragment.updateCalendar()
+                                dialog.dismiss()
+                            }
+                        }
+                        .setNegativeButton("No") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .create()
+                        .show()
+
             }
         }
 
