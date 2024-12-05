@@ -77,4 +77,6 @@ dependencies {
     // Support for older devices
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
+    // Background worker
+    implementation(libs.androidx.work.runtime.ktx)
 }

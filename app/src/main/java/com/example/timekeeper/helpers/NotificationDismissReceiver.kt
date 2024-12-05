@@ -14,7 +14,7 @@ class NotificationDismissReceiver: BroadcastReceiver() {
         // Gets extra information
         val reminderId = intent.getIntExtra("reminder_id", -1)
 
-        // Checks if the is extra information
+        // Checks if there is extra information
         if (reminderId != -1) {
             // Database setup
             val db = ReminderDatabase.getDatabase(context)

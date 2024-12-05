@@ -1,5 +1,6 @@
 package com.example.timekeeper.fragments
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,17 +10,25 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.timekeeper.adapters.ReminderAdapter
 import com.example.timekeeper.R
 import com.example.timekeeper.adapters.NotificationAdapter
 import com.example.timekeeper.database.ReminderDatabase
+import com.example.timekeeper.helpers.MidnightWorker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
+import java.util.Calendar
+import java.util.concurrent.TimeUnit
 
 class HomeFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        scheduleDailyWork(requireContext())
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -58,4 +67,37 @@ class HomeFragment : Fragment() {
         return view
     }
 
+    fun scheduleDailyWork(context: Context) {
+        // Constraints for the work to run
+        val constraints = Constraints.Builder()
+            .setRequiresBatteryNotLow(false)
+            .setRequiresCharging(false)
+            .build()
+
+        // Create the PeriodicWorkRequest
+        val workRequest = PeriodicWorkRequestBuilder<MidnightWorker>(24, TimeUnit.HOURS)
+            .setConstraints(constraints)
+            .setInitialDelay(calculateInitialDelay(), TimeUnit.MILLISECONDS) // Calculate delay
+            .build()
+
+        // Schedule the work
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            "MidnightWorker", // Unique name to avoid duplicates
+            ExistingPeriodicWorkPolicy.REPLACE, // Replace if it already exists
+            workRequest
+        )
+    }
+
+    // Function to calculate the initial delay until the next midnight
+    private fun calculateInitialDelay(): Long {
+        val currentTime = System.currentTimeMillis()
+        val nextMidnight = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+            add(Calendar.DAY_OF_MONTH, 1) // Move to the next day
+        }.timeInMillis
+        return nextMidnight - currentTime
+    }
 }

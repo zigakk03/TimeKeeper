@@ -79,7 +79,7 @@ class EventAdapter(
             holder.itemView.findViewById<TextView>(R.id.tvTime).text = ""
         }
 
-        // Set btnDelete onClick todo - complicated delete
+        // Set btnDelete onClick
         holder.itemView.findViewById<ImageButton>(R.id.btnDelete).setOnClickListener {
             val db = ReminderDatabase.getDatabase(appContext)
             val reminderDao = db.reminderDao()
