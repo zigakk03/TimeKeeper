@@ -20,7 +20,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.timekeeper"
-        minSdk = 24
+        minSdk = 31
         //noinspection OldTargetApi
         targetSdk = 34
         versionCode = 1
