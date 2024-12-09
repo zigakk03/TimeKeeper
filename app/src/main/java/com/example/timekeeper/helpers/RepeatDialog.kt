@@ -174,8 +174,8 @@ class RepeatDialog(startDate: LocalDate, repeatPeriod: String, interval: Int, en
     fun updateSekBar(){
         val progress = dialogView.findViewById<SeekBar>(R.id.sbRepeatFrequency).progress
         val progressValue = (progress + 1).toString()
+        repeatInterval = progressValue.toInt()
         if (progress > 0) {
-            repeatInterval = progressValue.toInt()
             dialogView.findViewById<TextView>(R.id.txtRepeatFrequency).text = "Repeat every " + progressValue + " " + frequencyType + "s"
         }
         else {

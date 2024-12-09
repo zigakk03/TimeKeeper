@@ -1,12 +1,15 @@
 package com.example.timekeeper.adapters
 
+import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.ImageButton
+import android.widget.ListView
 import android.widget.TextView
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LifecycleCoroutineScope
@@ -15,8 +18,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.timekeeper.R
 import com.example.timekeeper.database.Reminder
 import com.example.timekeeper.database.ReminderDatabase
+import com.example.timekeeper.fragments.CalendarFragmentDirections
 import com.example.timekeeper.fragments.HomeFragmentDirections
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class ReminderAdapter(
@@ -70,10 +75,67 @@ class ReminderAdapter(
 
         // Set btnEdit onClick
         holder.itemView.findViewById<ImageButton>(R.id.btnEdit).setOnClickListener {
-            // Sets the navigation arguments
-            val action = HomeFragmentDirections.navigateHomeToEditReminder(curReminder.id)
-            // Navigates to edit reminder page
-            Navigation.findNavController(holder.itemView).navigate(action)
+            if (curReminder.eventId == null) {
+                // Sets the navigation arguments
+                val action = HomeFragmentDirections.navigateHomeToEditReminder(curReminder.id)
+                // Navigates to edit reminder page
+                Navigation.findNavController(holder.itemView).navigate(action)
+            }
+            else {
+
+                val dialogView = LayoutInflater.from(appContext)
+                    .inflate(R.layout.alert_dialog, null)
+                dialogView.findViewById<TextView>(R.id.txtAlertDialogTitle).text =
+                    "What would you like to edit?"
+
+                val optionsDialog =
+                    AlertDialog.Builder(appContext, R.style.AlertDialog)
+                        .setView(dialogView)
+                        .setNegativeButton("Cancel") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .create()
+
+                val options: Array<String> = arrayOf(
+                    "Only this reminder",
+                    "The entire event"
+                )
+
+                // Set up the ListView
+                val listView = dialogView.findViewById<ListView>(R.id.lvOptions)
+                val adapter = ArrayAdapter(
+                    appContext,
+                    android.R.layout.simple_list_item_1,
+                    options
+                )
+                listView.adapter = adapter
+
+                // Handle item clicks
+                listView.setOnItemClickListener { _, _, i, _ ->
+                    when (i) {
+                        0 -> {
+                            // Sets the navigation arguments
+                            val action = HomeFragmentDirections.navigateHomeToEditReminder(curReminder.id)
+                            // Navigates to edit reminder page
+                            Navigation.findNavController(holder.itemView).navigate(action)
+                        }
+                        1 -> {
+                            // Sets the navigation arguments
+                            val action = HomeFragmentDirections.navigateHomeToEditEvent(
+                                curReminder.eventId,
+                                LocalDate.now()
+                            )
+                            // Navigates to edit reminder page
+                            Navigation.findNavController(holder.itemView).navigate(action)
+                        }
+                    }
+
+                    // dismiss dialog
+                    optionsDialog.dismiss()
+                }
+
+                optionsDialog.show()
+            }
         }
     }
 

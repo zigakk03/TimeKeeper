@@ -133,8 +133,6 @@ class MidnightWorker(context: Context, workerParams: WorkerParameters) : Worker(
 
                 }
             }
-
-            // todo - notification shows later (if it has the time set)
         }
 
         return Result.success()

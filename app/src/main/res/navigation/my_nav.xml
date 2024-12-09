@@ -60,6 +60,13 @@
             app:popEnterAnim="@android:anim/slide_in_left"
             app:popExitAnim="@android:anim/fade_out"
             app:popUpTo="@id/homeFragment" />
+        <action
+            android:id="@+id/navigate_home_to_editEvent"
+            app:destination="@id/editEventFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/editReminderFragment"
