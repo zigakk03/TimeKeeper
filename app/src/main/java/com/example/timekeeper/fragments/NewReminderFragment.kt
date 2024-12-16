@@ -29,6 +29,7 @@ import com.example.timekeeper.database.Event
 import com.example.timekeeper.database.Reminder
 import com.example.timekeeper.database.ReminderDatabase
 import com.example.timekeeper.database.RepeatType
+import com.example.timekeeper.helpers.ReminderOptionsDialog
 import com.example.timekeeper.helpers.RepeatDialog
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
@@ -53,6 +54,8 @@ class NewReminderFragment : Fragment() {
     private var repeatPeriod: String = ""
     private var interval: Int = 1
     private var endRepeatDate: LocalDate? = null
+
+    private var selectedNotificationOptions: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -338,6 +341,8 @@ class NewReminderFragment : Fragment() {
                 view.findViewById<TextView>(R.id.txtEndDate).setText(endDate.format(
                     DateTimeFormatter.ofPattern("d. M. yyyy")))
             }
+            selectedNotificationOptions = ""
+            view.findViewById<TextView>(R.id.txtEventReminderTimeText).text = ""
         }
 
         // Sets the repeat button on click
@@ -346,7 +351,7 @@ class NewReminderFragment : Fragment() {
             // Shows the recurrence dialog
             repeatDialog.show(childFragmentManager,"RecurrenceDialog")
 
-            childFragmentManager.setFragmentResultListener("repeatFragmentDialogRequestCode",this) { requestKey, bundle ->
+            childFragmentManager.setFragmentResultListener("repeatFragmentDialogRequestCode",this) { _, bundle ->
                 repeatPeriod = bundle.getString("repeatPeriod") ?: ""
                 interval = bundle.getInt("interval")
                 val endRepeatDateText = bundle.getString("endDate")
@@ -383,6 +388,18 @@ class NewReminderFragment : Fragment() {
                             "Every $repeatPeriod | $endRepeatDateText"
                     }
                 }
+            }
+        }
+
+        view.findViewById<ImageButton>(R.id.btnEventReminderTime).setOnClickListener {
+            val reminderOptionsDialog = ReminderOptionsDialog(view.findViewById<Switch>(R.id.swIncludesTime).isChecked, selectedNotificationOptions)
+            // Shows the recurrence dialog
+            reminderOptionsDialog.show(childFragmentManager,"NotificationDialog")
+
+            childFragmentManager.setFragmentResultListener("notificationFragmentDialogRequestCode",this) { _, bundle ->
+                selectedNotificationOptions = bundle.getString("selectedOptions") ?: ""
+
+                view.findViewById<TextView>(R.id.txtEventReminderTimeText).text = selectedNotificationOptions
             }
         }
 
