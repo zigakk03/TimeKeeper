@@ -30,10 +30,18 @@ interface ReminderDao {
     // ----- Event -----
 
     @Upsert
-    suspend fun upsertEvent(event: Event)
+    suspend fun upsertEvent(event: Event): Long
 
     @Query("SELECT * FROM event WHERE startDate <= :selectedDate AND (repeatEnd >= :selectedDate OR repeatEnd IS NULL)")
     suspend fun getEventsRelevantToSelectedDate(selectedDate: LocalDate? = LocalDate.now()): MutableList<Event>
+
+    @Query("SELECT * " +
+            "FROM event " +
+            "WHERE startDate <= :selectedDate " +
+            "AND (repeatEnd >= :selectedDate OR repeatEnd IS NULL) " +
+            "AND notificationOptions IS NOT NULL " +
+            "AND notificationOptions != ''")
+    suspend fun getEventsRelevantToSelectedDateWithNotifications(selectedDate: LocalDate? = LocalDate.now()): MutableList<Event>
 
     @Delete
     suspend fun deleteEvent(event: Event)

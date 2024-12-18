@@ -21,7 +21,7 @@ data class Event(
     val repeatInterval: Int = 1,
     val repeatEnd: LocalDate? = null, // Recurrence end date
 
-    val notificationId: Int? = null
+    val notificationOptions: String? = null
     // Todo - notification / reminder
 )
 

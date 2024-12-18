@@ -63,7 +63,6 @@ class NewReminderFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     @OptIn(ExperimentalStdlibApi::class)
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -150,7 +149,8 @@ class NewReminderFragment : Fragment() {
                                     endTime,
                                     repeatType,
                                     interval,
-                                    endRepeatDate
+                                    endRepeatDate,
+                                    selectedNotificationOptions
                                 )
                             )
                         }
@@ -167,7 +167,8 @@ class NewReminderFragment : Fragment() {
                                     null,
                                     repeatType,
                                     interval,
-                                    endRepeatDate
+                                    endRepeatDate,
+                                    selectedNotificationOptions
                                 )
                             )
                         }

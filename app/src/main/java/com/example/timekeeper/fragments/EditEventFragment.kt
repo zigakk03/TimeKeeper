@@ -29,6 +29,7 @@ import com.example.timekeeper.R
 import com.example.timekeeper.database.Event
 import com.example.timekeeper.database.ReminderDatabase
 import com.example.timekeeper.database.RepeatType
+import com.example.timekeeper.helpers.ReminderOptionsDialog
 import com.example.timekeeper.helpers.RepeatDialog
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
@@ -55,6 +56,8 @@ class editEventFragment : Fragment() {
     private var endRepeatDate: LocalDate? = null
 
     lateinit var selectedEvent: Event
+
+    private var selectedNotificationOptions: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,6 +111,9 @@ class editEventFragment : Fragment() {
                 view.findViewById<TextView>(R.id.txtEndDate).setText(endDate.format(
                     DateTimeFormatter.ofPattern("d. M. yyyy")))
             }
+
+            view.findViewById<TextView>(R.id.txtEventReminderTimeText).setText(selectedEvent.notificationOptions)
+            selectedNotificationOptions = selectedEvent.notificationOptions?: ""
 
             repeatPeriod = when(selectedEvent.repeatType) {
                 RepeatType.DAILY -> "day"
@@ -257,7 +263,8 @@ class editEventFragment : Fragment() {
                                                     selectedEvent.endTime,
                                                     selectedEvent.repeatType,
                                                     selectedEvent.repeatInterval,
-                                                    selectedEvent.repeatEnd
+                                                    selectedEvent.repeatEnd,
+                                                    selectedEvent.notificationOptions
                                                 )
                                             )
                                         }
@@ -275,7 +282,8 @@ class editEventFragment : Fragment() {
                                                     selectedEvent.endTime,
                                                     selectedEvent.repeatType,
                                                     selectedEvent.repeatInterval,
-                                                    args.selectedDay.minusDays(1)
+                                                    args.selectedDay.minusDays(1),
+                                                    selectedEvent.notificationOptions
                                                 )
                                             )
                                         } else {
@@ -300,7 +308,8 @@ class editEventFragment : Fragment() {
                                                     endTime,
                                                     RepeatType.NONE,
                                                     1,
-                                                    null
+                                                    null,
+                                                    selectedNotificationOptions
                                                 )
                                             )
                                         } else {
@@ -321,7 +330,8 @@ class editEventFragment : Fragment() {
                                                     null,
                                                     RepeatType.NONE,
                                                     1,
-                                                    null
+                                                    null,
+                                                    selectedNotificationOptions
                                                 )
                                             )
                                         }
@@ -343,7 +353,8 @@ class editEventFragment : Fragment() {
                                                     selectedEvent.endTime,
                                                     selectedEvent.repeatType,
                                                     selectedEvent.repeatInterval,
-                                                    args.selectedDay.minusDays(1)
+                                                    args.selectedDay.minusDays(1),
+                                                    selectedEvent.notificationOptions
                                                 )
                                             )
                                         } else {
@@ -368,7 +379,8 @@ class editEventFragment : Fragment() {
                                                     endTime,
                                                     repeatType,
                                                     interval,
-                                                    endRepeatDate
+                                                    endRepeatDate,
+                                                    selectedNotificationOptions
                                                 )
                                             )
                                         } else {
@@ -389,7 +401,8 @@ class editEventFragment : Fragment() {
                                                     null,
                                                     repeatType,
                                                     interval,
-                                                    endRepeatDate
+                                                    endRepeatDate,
+                                                    selectedNotificationOptions
                                                 )
                                             )
                                         }
@@ -411,7 +424,8 @@ class editEventFragment : Fragment() {
                                                     endTime,
                                                     repeatType,
                                                     interval,
-                                                    endRepeatDate
+                                                    endRepeatDate,
+                                                    selectedNotificationOptions
                                                 )
                                             )
                                         } else {
@@ -427,7 +441,8 @@ class editEventFragment : Fragment() {
                                                     null,
                                                     repeatType,
                                                     interval,
-                                                    endRepeatDate
+                                                    endRepeatDate,
+                                                    selectedNotificationOptions
                                                 )
                                             )
                                         }
@@ -460,7 +475,8 @@ class editEventFragment : Fragment() {
                                         endTime,
                                         repeatType,
                                         interval,
-                                        endRepeatDate
+                                        endRepeatDate,
+                                        selectedNotificationOptions
                                     )
                                 )
                             } else {
@@ -476,7 +492,8 @@ class editEventFragment : Fragment() {
                                         null,
                                         repeatType,
                                         interval,
-                                        endRepeatDate
+                                        endRepeatDate,
+                                        selectedNotificationOptions
                                     )
                                 )
                             }
@@ -624,6 +641,8 @@ class editEventFragment : Fragment() {
                 view.findViewById<TextView>(R.id.txtEndDate).setText(endDate.format(
                     DateTimeFormatter.ofPattern("d. M. yyyy")))
             }
+            selectedNotificationOptions = ""
+            view.findViewById<TextView>(R.id.txtEventReminderTimeText).text = ""
         }
 
         // Sets the repeat button on click
@@ -669,6 +688,18 @@ class editEventFragment : Fragment() {
                             "Every $repeatPeriod | $endRepeatDateText"
                     }
                 }
+            }
+        }
+
+        view.findViewById<ImageButton>(R.id.btnEventReminderTime).setOnClickListener {
+            val reminderOptionsDialog = ReminderOptionsDialog(view.findViewById<Switch>(R.id.swIncludesTime).isChecked, selectedNotificationOptions)
+            // Shows the recurrence dialog
+            reminderOptionsDialog.show(childFragmentManager,"NotificationDialog")
+
+            childFragmentManager.setFragmentResultListener("notificationFragmentDialogRequestCode",this) { _, bundle ->
+                selectedNotificationOptions = bundle.getString("selectedOptions") ?: ""
+
+                view.findViewById<TextView>(R.id.txtEventReminderTimeText).text = selectedNotificationOptions
             }
         }
 

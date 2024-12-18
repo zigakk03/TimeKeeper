@@ -26,7 +26,7 @@ class ReminderOptionsDialog(hasTime: Boolean, selectedOptions: String) : DialogF
 
         dialogView.findViewById<TextView>(R.id.txtAlertDialogTitle).text = "Select event reminder"
 
-        val redableOptions: Array<String> =
+        val readableOptions: Array<String> =
             if (includesTime) {
                 arrayOf(
                     "10 minutes before",
@@ -95,7 +95,7 @@ class ReminderOptionsDialog(hasTime: Boolean, selectedOptions: String) : DialogF
         val adapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_list_item_multiple_choice, // Use multiple-choice layout
-            redableOptions
+            readableOptions
         )
         listView.adapter = adapter
         listView.choiceMode = ListView.CHOICE_MODE_MULTIPLE // Enable multiple selections
