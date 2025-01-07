@@ -260,7 +260,7 @@ class CalendarFragment : Fragment() {
         var date: LocalDate
         if (days[0].dayString != "1") {
             date = LocalDate.parse(
-                selectedMonth.year.toString() + "-" + selectedMonth.minusMonths(1).month.value + "-" + days[0].dayString,
+                selectedMonth.minusMonths(1).year.toString() + "-" + selectedMonth.minusMonths(1).month.value + "-" + days[0].dayString,
                 dateFormat
             )
         } else {
