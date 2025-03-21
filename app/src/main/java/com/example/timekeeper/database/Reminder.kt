@@ -11,5 +11,6 @@ data class Reminder(
     val color: String?,
     val title: String,
     val description: String,
-    val dateTime: LocalDateTime
-)
+    val dateTime: LocalDateTime,
+    val eventId: Int?
+    )

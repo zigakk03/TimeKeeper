@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -24,6 +25,7 @@
             </intent-filter>
         </activity>
         <receiver android:name=".helpers.NotificationDismissReceiver" />
+        <receiver android:name=".helpers.NotificationAlarmCreatorReceiver" />
     </application>
 
 </manifest>

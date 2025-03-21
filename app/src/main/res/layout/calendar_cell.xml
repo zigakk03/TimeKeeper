@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <View
+        android:id="@+id/graphicsBar"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/vSelectedCircle"
+        android:layout_width="30sp"
+        android:layout_height="30sp"
+        android:background="@drawable/date_circle"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.25"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/txtCalendarDay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/vSelectedCircle"
+        app:layout_constraintEnd_toEndOf="@+id/vSelectedCircle"
+        app:layout_constraintStart_toStartOf="@+id/vSelectedCircle"
+        app:layout_constraintTop_toTopOf="@+id/vSelectedCircle" />
+
+    <View
+        android:id="@+id/vEvent1"
+        android:layout_width="0dp"
+        android:layout_height="8dp"
+        android:alpha="0"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="2dp"
+        android:background="@drawable/rounded_corners"
+        android:backgroundTint="@color/accent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtCalendarDay" />
+
+    <TextView
+        android:id="@+id/txtEvent1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:alpha="0"
+        android:fontFamily="sans-serif"
+        android:singleLine="true"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="8sp"
+        app:layout_constraintBottom_toBottomOf="@+id/vEvent1"
+        app:layout_constraintEnd_toEndOf="@+id/vEvent1"
+        app:layout_constraintStart_toStartOf="@+id/vEvent1"
+        app:layout_constraintTop_toTopOf="@+id/vEvent1"
+        app:layout_constraintVertical_bias="0.75" />
+
+    <View
+        android:id="@+id/vEvent2"
+        android:layout_width="0dp"
+        android:layout_height="8dp"
+        android:alpha="0"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
+        android:background="@drawable/rounded_corners"
+        android:backgroundTint="@color/accent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vEvent1" />
+
+    <TextView
+        android:id="@+id/txtEvent2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:alpha="0"
+        android:fontFamily="sans-serif"
+        android:singleLine="true"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="8sp"
+        app:layout_constraintBottom_toBottomOf="@+id/vEvent2"
+        app:layout_constraintEnd_toEndOf="@+id/vEvent2"
+        app:layout_constraintStart_toStartOf="@+id/vEvent2"
+        app:layout_constraintTop_toTopOf="@+id/vEvent2"
+        app:layout_constraintVertical_bias="0.75" />
+
+    <View
+        android:id="@+id/vEvent3"
+        android:layout_width="0dp"
+        android:layout_height="8dp"
+        android:alpha="0"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
+        android:background="@drawable/rounded_corners"
+        android:backgroundTint="@color/accent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vEvent2" />
+
+    <TextView
+        android:id="@+id/txtEvent3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:alpha="0"
+        android:fontFamily="sans-serif"
+        android:singleLine="true"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="8sp"
+        app:layout_constraintBottom_toBottomOf="@+id/vEvent3"
+        app:layout_constraintEnd_toEndOf="@+id/vEvent3"
+        app:layout_constraintStart_toStartOf="@+id/vEvent3"
+        app:layout_constraintTop_toTopOf="@+id/vEvent3"
+        app:layout_constraintVertical_bias="0.75" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

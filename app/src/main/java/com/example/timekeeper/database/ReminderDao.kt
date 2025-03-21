@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Dao
@@ -24,4 +25,27 @@ interface ReminderDao {
     // Gets a reminder with the given id
     @Query("SELECT * FROM reminder WHERE id=:id")
     suspend fun getReminder(id: Int): Reminder
+
+
+    // ----- Event -----
+
+    @Upsert
+    suspend fun upsertEvent(event: Event): Long
+
+    @Query("SELECT * FROM event WHERE startDate <= :selectedDate AND (repeatEnd >= :selectedDate OR repeatEnd IS NULL)")
+    suspend fun getEventsRelevantToSelectedDate(selectedDate: LocalDate? = LocalDate.now()): MutableList<Event>
+
+    @Query("SELECT * " +
+            "FROM event " +
+            "WHERE startDate <= :selectedDate " +
+            "AND (repeatEnd >= :selectedDate OR repeatEnd IS NULL) " +
+            "AND notificationOptions IS NOT NULL " +
+            "AND notificationOptions != ''")
+    suspend fun getEventsRelevantToSelectedDateWithNotifications(selectedDate: LocalDate? = LocalDate.now()): MutableList<Event>
+
+    @Delete
+    suspend fun deleteEvent(event: Event)
+
+    @Query("SELECT * FROM event WHERE id=:id")
+    suspend fun getEvent(id: Int): Event
 }

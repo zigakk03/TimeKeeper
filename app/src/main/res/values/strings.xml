@@ -13,4 +13,23 @@
     <string name="i_txt_notification_description">Description</string>
     <string name="notification_channel_name">Time Keeper Notifications</string>
     <string name="notification_channel_description">Notifications to help you manage your time and stay on track with your schedule.</string>
+    <string name="repeat_dialog_title">Select Repeat Method</string>
+    <string name="repeat_dialog_ends">Ends:</string>
+    <string name="repeat_dialog_yearly">Yearly</string>
+    <string name="repeat_dialog_monthly">Monthly</string>
+    <string name="repeat_dialog_weekly">Weekly</string>
+    <string name="repeat_dialog_daily">Daily</string>
+    <string name="repeat_dialog_none">None</string>
+    <string name="repeat_dialog_end_date_button">Select end date for repeat</string>
+    <string name="add_reminder_reminder">Reminder</string>
+    <string name="add_reminder_event">Event</string>
+    <string name="add_reminder_start_date">Start:</string>
+    <string name="add_reminder_end_date">End:</string>
+    <string name="add_reminder_select_start_date">Select start date</string>
+    <string name="add_reminder_select_end_date">Select end date</string>
+    <string name="add_reminder_repeat">Repeat:</string>
+    <string name="add_reminder_notification">Notification:</string>
+    <string name="add_reminder_select_repeat">Select repeat</string>
+    <string name="add_reminder_select_notification">Select notification</string>
+    <string name="edit_event_tile">Edit Event</string>
 </resources>

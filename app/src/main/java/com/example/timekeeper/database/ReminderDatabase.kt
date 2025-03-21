@@ -8,10 +8,13 @@ import androidx.room.TypeConverters
 
 // Initiates the room database
 @Database(
-    entities = [Reminder::class],
-    version = 1
+    entities = [
+        Reminder::class,
+        Event::class
+               ],
+    version = 10
 )
-@TypeConverters(DateTimeConverters::class)
+@TypeConverters(DateTimeConverters::class, RecurrenceConverters::class)
 abstract class ReminderDatabase: RoomDatabase() {
     abstract fun reminderDao(): ReminderDao
 
@@ -24,7 +27,7 @@ abstract class ReminderDatabase: RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     ReminderDatabase::class.java,
-                    "notifications"
+                    "time_keeper_db"
                 )
                     // On schema change destroys previous data
                     .fallbackToDestructiveMigration()
